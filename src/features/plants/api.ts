@@ -1,5 +1,6 @@
 import { queryOptions, useMutation, useQueryClient } from '@tanstack/react-query'
 
+import { tasksKey } from '@/features/care/keys'
 import { roomColumns, roomsKey, type Room } from '@/features/rooms/api'
 import { supabase } from '@/lib/supabase'
 
@@ -110,10 +111,13 @@ export const toFormValues = (p: Plant): PlantFormValues => ({
 
 type SaveInput = { values: PlantFormValues; photo: Blob | null }
 
+/** How long ago the plant was last watered, when known; logged so the first task lands right. */
+type CreateInput = SaveInput & { lastWateredDaysAgo: number | null }
+
 export function useCreatePlant(userId: string) {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async ({ values, photo }: SaveInput) => {
+    mutationFn: async ({ values, photo, lastWateredDaysAgo }: CreateInput) => {
       const cover_photo = photo ? await uploadPhoto(userId, photo) : null
       const { data, error } = await supabase
         .from('plants')
@@ -133,9 +137,18 @@ export function useCreatePlant(userId: string) {
         if (cover_photo) await removePhotos([cover_photo])
         throw schedule.error
       }
+      if (lastWateredDaysAgo != null) {
+        const at = new Date(Date.now() - lastWateredDaysAgo * 86_400_000).toISOString()
+        // Best effort: without it the first watering is simply due today.
+        await supabase.from('care_events').insert({ plant_id: data.id, type: 'water', at })
+      }
       return data
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: roomsKey }),
+    onSuccess: () =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: roomsKey }),
+        queryClient.invalidateQueries({ queryKey: tasksKey }),
+      ]),
   })
 }
 
@@ -167,6 +180,7 @@ export function useUpdatePlant(userId: string, plant: Plant) {
     onSuccess: () =>
       Promise.all([
         queryClient.invalidateQueries({ queryKey: [...plantsKey, plant.id] }),
+        queryClient.invalidateQueries({ queryKey: tasksKey }),
         queryClient.invalidateQueries({ queryKey: roomsKey }),
       ]),
   })
@@ -182,7 +196,10 @@ export function useDeletePlant(plant: Plant) {
     },
     onSuccess: () => {
       queryClient.removeQueries({ queryKey: [...plantsKey, plant.id] })
-      return queryClient.invalidateQueries({ queryKey: roomsKey })
+      return Promise.all([
+        queryClient.invalidateQueries({ queryKey: roomsKey }),
+        queryClient.invalidateQueries({ queryKey: tasksKey }),
+      ])
     },
   })
 }

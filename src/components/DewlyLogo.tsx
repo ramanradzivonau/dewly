@@ -1,8 +1,9 @@
-/** The Dewly mark (dew drop with leaf veins) and the lowercase wordmark. */
-export function DewlyLogo() {
+/** The Dewly mark (dew drop with leaf veins) and the lowercase wordmark. `sm` heads Today. */
+export function DewlyLogo({ size = 'lg' }: { size?: 'sm' | 'lg' }) {
+  const mark = size === 'sm' ? 32 : 56
   return (
-    <div className="flex items-center gap-2.5">
-      <svg width="56" height="56" viewBox="0 0 48 48" role="img" aria-label="Dewly">
+    <div className={`flex items-center ${size === 'sm' ? 'gap-2' : 'gap-2.5'}`}>
+      <svg width={mark} height={mark} viewBox="0 0 48 48" role="img" aria-label="Dewly">
         <rect width="48" height="48" rx="14" className="fill-primary" />
         <path
           d="M24 7C15.5 15 11.5 22.5 11.5 29a12.5 12.5 0 0 0 25 0C36.5 22.5 32.5 15 24 7z"
@@ -16,7 +17,14 @@ export function DewlyLogo() {
           className="stroke-primary"
         />
       </svg>
-      <span aria-hidden="true" className="text-wordmark text-primary">
+      <span
+        aria-hidden="true"
+        className={
+          size === 'sm'
+            ? 'text-section tracking-[-0.6px] text-primary'
+            : 'text-wordmark text-primary'
+        }
+      >
         dewly
       </span>
     </div>
