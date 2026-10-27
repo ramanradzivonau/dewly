@@ -23,7 +23,7 @@ export type RoomPlant = { id: string; nickname: string; cover_photo: string | nu
 
 export type RoomWithPlants = Room & { plants: RoomPlant[] }
 
-const roomColumns =
+export const roomColumns =
   'id, name, light, window_dir, winter_min, winter_max, summer_min, summer_max, humidity_min, humidity_max, drafts'
 const withPlants = `${roomColumns}, plants (id, nickname, cover_photo)`
 
