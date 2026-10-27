@@ -1,6 +1,6 @@
-# Dewly — MVP requirements
+# Plant Care App — MVP requirements
 
-> English translation of the Claude Docs requirements ("Plant Care App"), as of 2026-10-27. Source: https://claude.ai/artifact/T58QghDVaPnv68Zm79N7Rb
+> Copy of the Claude Docs requirements, as of 2026-10-27. Source: https://claude.ai/artifact/T58QghDVaPnv68Zm79N7Rb
 
 ## Overview
 
@@ -9,7 +9,7 @@ A personal PWA for houseplant care: a Planta replacement with a fast interface, 
 - **Platform:** PWA, installed on iPhone via Add to Home Screen (iOS 16.4+ for push).
 - **UI language:** English.
 - **Users:** only the author for now; public launch and multi-user hardening come later.
-- **Format:** side project built in a vibe-coding style; stack and implementation plan were discussed after requirements and design.
+- **Format:** side project built in a vibe-coding style; stack and implementation plan are discussed after requirements and design.
 
 ## Account and sign-in
 
@@ -193,9 +193,9 @@ AI requests are cached by plant species so identical questions don't spend limit
 - A Home Screen widget: PWAs don't have one; an option is Scriptable with data from the API.
 - Extra care tasks: treatment (e.g. a pest-control course), and custom tasks with a user-defined name and frequency.
 
-**Decisions:**
+**Open questions:**
 
-- Species search by name with an image list uses the iNaturalist API (species autocomplete): free, no key, returns photos and English names. Pl@ntNet stays for identification by photo.
-- Pet toxicity comes from Gemini together with the rest of the species data and is shown labelled "AI-generated, verify if unsure".
-- Per-plant reminders are not needed; summaries 1–5 times a day stay.
-- Stack and implementation plan were discussed after the design (see [plan.md](plan.md)).
+- [ ] Decided: species search by name with an image list uses the iNaturalist API (species autocomplete): free, no key, returns photos and English names. Pl@ntNet stays for identification by photo.
+- [ ] Decided: pet toxicity comes from Gemini together with the rest of the species data and is shown labelled "AI-generated, verify if unsure".
+- [ ] Decided: per-plant reminders are not needed; summaries 1–5 times a day stay.
+- [ ] Stack and implementation plan — discussed after the design.

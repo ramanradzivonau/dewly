@@ -1,6 +1,6 @@
 # Dewly — MVP implementation plan
 
-> English translation of the Claude Docs plan, as of 2026-10-27. Source: https://claude.ai/artifact/8r5wV7eDBqRB2qyNdX7RFg
+> Copy of the Claude Docs plan, as of 2026-10-27. Source: https://claude.ai/artifact/8r5wV7eDBqRB2qyNdX7RFg
 
 ## Stack
 
@@ -79,7 +79,7 @@ Goal for the first evening: phase 1 and the start of phase 2 — an empty Dewly 
 - [ ] Project email, then a public `dewly` repository on your personal GitHub
 - [ ] Supabase account on the project email, project in Frankfurt (eu-central-1)
 - [ ] Cloudflare account for Pages
-- [ ] Node.js 22.12+ on your computer (the plan originally said 20+; current Vite and PWA tooling need 22.12+)
+- [ ] Node.js 22.12+ on your computer
 - [ ] Gemini and Pl@ntNet keys can wait until phase 6
 
 **Work:**
