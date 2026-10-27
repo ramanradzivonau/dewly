@@ -22,6 +22,7 @@ import { Route as GuestSignupRouteImport } from './routes/_guest/signup'
 import { Route as AuthedTabsPlantsRouteImport } from './routes/_authed/_tabs/plants'
 import { Route as AuthedTabsProfileRouteImport } from './routes/_authed/_tabs/profile'
 import { Route as AuthedTabsTodayRouteImport } from './routes/_authed/_tabs/today'
+import { Route as AuthedOnboardingCityRouteImport } from './routes/_authed/onboarding/city'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -85,6 +86,11 @@ const AuthedTabsTodayRoute = AuthedTabsTodayRouteImport.update({
   path: '/today',
   getParentRoute: () => AuthedTabsRoute,
 } as any)
+const AuthedOnboardingCityRoute = AuthedOnboardingCityRouteImport.update({
+  id: '/onboarding/city',
+  path: '/onboarding/city',
+  getParentRoute: () => AuthedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -97,6 +103,7 @@ export interface FileRoutesByFullPath {
   '/plants': typeof AuthedTabsPlantsRoute
   '/profile': typeof AuthedTabsProfileRoute
   '/today': typeof AuthedTabsTodayRoute
+  '/onboarding/city': typeof AuthedOnboardingCityRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -109,6 +116,7 @@ export interface FileRoutesByTo {
   '/plants': typeof AuthedTabsPlantsRoute
   '/profile': typeof AuthedTabsProfileRoute
   '/today': typeof AuthedTabsTodayRoute
+  '/onboarding/city': typeof AuthedOnboardingCityRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -125,6 +133,7 @@ export interface FileRoutesById {
   '/_authed/_tabs/plants': typeof AuthedTabsPlantsRoute
   '/_authed/_tabs/profile': typeof AuthedTabsProfileRoute
   '/_authed/_tabs/today': typeof AuthedTabsTodayRoute
+  '/_authed/onboarding/city': typeof AuthedOnboardingCityRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -139,6 +148,7 @@ export interface FileRouteTypes {
     | '/plants'
     | '/profile'
     | '/today'
+    | '/onboarding/city'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -151,6 +161,7 @@ export interface FileRouteTypes {
     | '/plants'
     | '/profile'
     | '/today'
+    | '/onboarding/city'
   id:
     | '__root__'
     | '/'
@@ -166,6 +177,7 @@ export interface FileRouteTypes {
     | '/_authed/_tabs/plants'
     | '/_authed/_tabs/profile'
     | '/_authed/_tabs/today'
+    | '/_authed/onboarding/city'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -269,6 +281,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedTabsTodayRouteImport
       parentRoute: typeof AuthedTabsRoute
     }
+    '/_authed/onboarding/city': {
+      id: '/_authed/onboarding/city'
+      path: '/onboarding/city'
+      fullPath: '/onboarding/city'
+      preLoaderRoute: typeof AuthedOnboardingCityRouteImport
+      parentRoute: typeof AuthedRoute
+    }
   }
 }
 
@@ -291,11 +310,13 @@ const AuthedTabsRouteWithChildren = AuthedTabsRoute._addFileChildren(
 interface AuthedRouteChildren {
   AuthedTabsRoute: typeof AuthedTabsRouteWithChildren
   AuthedNewPlantRoute: typeof AuthedNewPlantRoute
+  AuthedOnboardingCityRoute: typeof AuthedOnboardingCityRoute
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedTabsRoute: AuthedTabsRouteWithChildren,
   AuthedNewPlantRoute: AuthedNewPlantRoute,
+  AuthedOnboardingCityRoute: AuthedOnboardingCityRoute,
 }
 
 const AuthedRouteWithChildren =
