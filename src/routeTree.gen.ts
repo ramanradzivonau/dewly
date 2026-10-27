@@ -10,84 +10,170 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as TabsRouteImport } from './routes/_tabs'
-import { Route as NewPlantRouteImport } from './routes/new-plant'
-import { Route as TabsPlantsRouteImport } from './routes/_tabs/plants'
-import { Route as TabsProfileRouteImport } from './routes/_tabs/profile'
-import { Route as TabsTodayRouteImport } from './routes/_tabs/today'
+import { Route as AuthedRouteImport } from './routes/_authed'
+import { Route as GuestRouteImport } from './routes/_guest'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as VerifyRouteImport } from './routes/verify'
+import { Route as AuthedTabsRouteImport } from './routes/_authed/_tabs'
+import { Route as AuthedNewPlantRouteImport } from './routes/_authed/new-plant'
+import { Route as GuestForgotPasswordRouteImport } from './routes/_guest/forgot-password'
+import { Route as GuestLoginRouteImport } from './routes/_guest/login'
+import { Route as GuestSignupRouteImport } from './routes/_guest/signup'
+import { Route as AuthedTabsPlantsRouteImport } from './routes/_authed/_tabs/plants'
+import { Route as AuthedTabsProfileRouteImport } from './routes/_authed/_tabs/profile'
+import { Route as AuthedTabsTodayRouteImport } from './routes/_authed/_tabs/today'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TabsRoute = TabsRouteImport.update({
-  id: '/_tabs',
+const AuthedRoute = AuthedRouteImport.update({
+  id: '/_authed',
   getParentRoute: () => rootRouteImport,
 } as any)
-const NewPlantRoute = NewPlantRouteImport.update({
+const GuestRoute = GuestRouteImport.update({
+  id: '/_guest',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VerifyRoute = VerifyRouteImport.update({
+  id: '/verify',
+  path: '/verify',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthedTabsRoute = AuthedTabsRouteImport.update({
+  id: '/_tabs',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedNewPlantRoute = AuthedNewPlantRouteImport.update({
   id: '/new-plant',
   path: '/new-plant',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthedRoute,
 } as any)
-const TabsPlantsRoute = TabsPlantsRouteImport.update({
+const GuestForgotPasswordRoute = GuestForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => GuestRoute,
+} as any)
+const GuestLoginRoute = GuestLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => GuestRoute,
+} as any)
+const GuestSignupRoute = GuestSignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => GuestRoute,
+} as any)
+const AuthedTabsPlantsRoute = AuthedTabsPlantsRouteImport.update({
   id: '/plants',
   path: '/plants',
-  getParentRoute: () => TabsRoute,
+  getParentRoute: () => AuthedTabsRoute,
 } as any)
-const TabsProfileRoute = TabsProfileRouteImport.update({
+const AuthedTabsProfileRoute = AuthedTabsProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
-  getParentRoute: () => TabsRoute,
+  getParentRoute: () => AuthedTabsRoute,
 } as any)
-const TabsTodayRoute = TabsTodayRouteImport.update({
+const AuthedTabsTodayRoute = AuthedTabsTodayRouteImport.update({
   id: '/today',
   path: '/today',
-  getParentRoute: () => TabsRoute,
+  getParentRoute: () => AuthedTabsRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/new-plant': typeof NewPlantRoute
-  '/plants': typeof TabsPlantsRoute
-  '/profile': typeof TabsProfileRoute
-  '/today': typeof TabsTodayRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/verify': typeof VerifyRoute
+  '/new-plant': typeof AuthedNewPlantRoute
+  '/forgot-password': typeof GuestForgotPasswordRoute
+  '/login': typeof GuestLoginRoute
+  '/signup': typeof GuestSignupRoute
+  '/plants': typeof AuthedTabsPlantsRoute
+  '/profile': typeof AuthedTabsProfileRoute
+  '/today': typeof AuthedTabsTodayRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/new-plant': typeof NewPlantRoute
-  '/plants': typeof TabsPlantsRoute
-  '/profile': typeof TabsProfileRoute
-  '/today': typeof TabsTodayRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/verify': typeof VerifyRoute
+  '/new-plant': typeof AuthedNewPlantRoute
+  '/forgot-password': typeof GuestForgotPasswordRoute
+  '/login': typeof GuestLoginRoute
+  '/signup': typeof GuestSignupRoute
+  '/plants': typeof AuthedTabsPlantsRoute
+  '/profile': typeof AuthedTabsProfileRoute
+  '/today': typeof AuthedTabsTodayRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/_tabs': typeof TabsRouteWithChildren
-  '/new-plant': typeof NewPlantRoute
-  '/_tabs/plants': typeof TabsPlantsRoute
-  '/_tabs/profile': typeof TabsProfileRoute
-  '/_tabs/today': typeof TabsTodayRoute
+  '/_authed': typeof AuthedRouteWithChildren
+  '/_guest': typeof GuestRouteWithChildren
+  '/reset-password': typeof ResetPasswordRoute
+  '/verify': typeof VerifyRoute
+  '/_authed/_tabs': typeof AuthedTabsRouteWithChildren
+  '/_authed/new-plant': typeof AuthedNewPlantRoute
+  '/_guest/forgot-password': typeof GuestForgotPasswordRoute
+  '/_guest/login': typeof GuestLoginRoute
+  '/_guest/signup': typeof GuestSignupRoute
+  '/_authed/_tabs/plants': typeof AuthedTabsPlantsRoute
+  '/_authed/_tabs/profile': typeof AuthedTabsProfileRoute
+  '/_authed/_tabs/today': typeof AuthedTabsTodayRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/new-plant' | '/plants' | '/profile' | '/today'
+  fullPaths:
+    | '/'
+    | '/reset-password'
+    | '/verify'
+    | '/new-plant'
+    | '/forgot-password'
+    | '/login'
+    | '/signup'
+    | '/plants'
+    | '/profile'
+    | '/today'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/new-plant' | '/plants' | '/profile' | '/today'
+  to:
+    | '/'
+    | '/reset-password'
+    | '/verify'
+    | '/new-plant'
+    | '/forgot-password'
+    | '/login'
+    | '/signup'
+    | '/plants'
+    | '/profile'
+    | '/today'
   id:
     | '__root__'
     | '/'
-    | '/_tabs'
-    | '/new-plant'
-    | '/_tabs/plants'
-    | '/_tabs/profile'
-    | '/_tabs/today'
+    | '/_authed'
+    | '/_guest'
+    | '/reset-password'
+    | '/verify'
+    | '/_authed/_tabs'
+    | '/_authed/new-plant'
+    | '/_guest/forgot-password'
+    | '/_guest/login'
+    | '/_guest/signup'
+    | '/_authed/_tabs/plants'
+    | '/_authed/_tabs/profile'
+    | '/_authed/_tabs/today'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  TabsRoute: typeof TabsRouteWithChildren
-  NewPlantRoute: typeof NewPlantRoute
+  AuthedRoute: typeof AuthedRouteWithChildren
+  GuestRoute: typeof GuestRouteWithChildren
+  ResetPasswordRoute: typeof ResetPasswordRoute
+  VerifyRoute: typeof VerifyRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -99,62 +185,142 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_tabs': {
-      id: '/_tabs'
+    '/_authed': {
+      id: '/_authed'
       path: ''
       fullPath: '/'
-      preLoaderRoute: typeof TabsRouteImport
+      preLoaderRoute: typeof AuthedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/new-plant': {
-      id: '/new-plant'
+    '/_guest': {
+      id: '/_guest'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof GuestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/verify': {
+      id: '/verify'
+      path: '/verify'
+      fullPath: '/verify'
+      preLoaderRoute: typeof VerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authed/_tabs': {
+      id: '/_authed/_tabs'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthedTabsRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/new-plant': {
+      id: '/_authed/new-plant'
       path: '/new-plant'
       fullPath: '/new-plant'
-      preLoaderRoute: typeof NewPlantRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthedNewPlantRouteImport
+      parentRoute: typeof AuthedRoute
     }
-    '/_tabs/plants': {
-      id: '/_tabs/plants'
+    '/_guest/forgot-password': {
+      id: '/_guest/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof GuestForgotPasswordRouteImport
+      parentRoute: typeof GuestRoute
+    }
+    '/_guest/login': {
+      id: '/_guest/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof GuestLoginRouteImport
+      parentRoute: typeof GuestRoute
+    }
+    '/_guest/signup': {
+      id: '/_guest/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof GuestSignupRouteImport
+      parentRoute: typeof GuestRoute
+    }
+    '/_authed/_tabs/plants': {
+      id: '/_authed/_tabs/plants'
       path: '/plants'
       fullPath: '/plants'
-      preLoaderRoute: typeof TabsPlantsRouteImport
-      parentRoute: typeof TabsRoute
+      preLoaderRoute: typeof AuthedTabsPlantsRouteImport
+      parentRoute: typeof AuthedTabsRoute
     }
-    '/_tabs/profile': {
-      id: '/_tabs/profile'
+    '/_authed/_tabs/profile': {
+      id: '/_authed/_tabs/profile'
       path: '/profile'
       fullPath: '/profile'
-      preLoaderRoute: typeof TabsProfileRouteImport
-      parentRoute: typeof TabsRoute
+      preLoaderRoute: typeof AuthedTabsProfileRouteImport
+      parentRoute: typeof AuthedTabsRoute
     }
-    '/_tabs/today': {
-      id: '/_tabs/today'
+    '/_authed/_tabs/today': {
+      id: '/_authed/_tabs/today'
       path: '/today'
       fullPath: '/today'
-      preLoaderRoute: typeof TabsTodayRouteImport
-      parentRoute: typeof TabsRoute
+      preLoaderRoute: typeof AuthedTabsTodayRouteImport
+      parentRoute: typeof AuthedTabsRoute
     }
   }
 }
 
-interface TabsRouteChildren {
-  TabsPlantsRoute: typeof TabsPlantsRoute
-  TabsProfileRoute: typeof TabsProfileRoute
-  TabsTodayRoute: typeof TabsTodayRoute
+interface AuthedTabsRouteChildren {
+  AuthedTabsPlantsRoute: typeof AuthedTabsPlantsRoute
+  AuthedTabsProfileRoute: typeof AuthedTabsProfileRoute
+  AuthedTabsTodayRoute: typeof AuthedTabsTodayRoute
 }
 
-const TabsRouteChildren: TabsRouteChildren = {
-  TabsPlantsRoute: TabsPlantsRoute,
-  TabsProfileRoute: TabsProfileRoute,
-  TabsTodayRoute: TabsTodayRoute,
+const AuthedTabsRouteChildren: AuthedTabsRouteChildren = {
+  AuthedTabsPlantsRoute: AuthedTabsPlantsRoute,
+  AuthedTabsProfileRoute: AuthedTabsProfileRoute,
+  AuthedTabsTodayRoute: AuthedTabsTodayRoute,
 }
 
-const TabsRouteWithChildren = TabsRoute._addFileChildren(TabsRouteChildren)
+const AuthedTabsRouteWithChildren = AuthedTabsRoute._addFileChildren(
+  AuthedTabsRouteChildren,
+)
+
+interface AuthedRouteChildren {
+  AuthedTabsRoute: typeof AuthedTabsRouteWithChildren
+  AuthedNewPlantRoute: typeof AuthedNewPlantRoute
+}
+
+const AuthedRouteChildren: AuthedRouteChildren = {
+  AuthedTabsRoute: AuthedTabsRouteWithChildren,
+  AuthedNewPlantRoute: AuthedNewPlantRoute,
+}
+
+const AuthedRouteWithChildren =
+  AuthedRoute._addFileChildren(AuthedRouteChildren)
+
+interface GuestRouteChildren {
+  GuestForgotPasswordRoute: typeof GuestForgotPasswordRoute
+  GuestLoginRoute: typeof GuestLoginRoute
+  GuestSignupRoute: typeof GuestSignupRoute
+}
+
+const GuestRouteChildren: GuestRouteChildren = {
+  GuestForgotPasswordRoute: GuestForgotPasswordRoute,
+  GuestLoginRoute: GuestLoginRoute,
+  GuestSignupRoute: GuestSignupRoute,
+}
+
+const GuestRouteWithChildren = GuestRoute._addFileChildren(GuestRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  TabsRoute: TabsRouteWithChildren,
-  NewPlantRoute: NewPlantRoute,
+  AuthedRoute: AuthedRouteWithChildren,
+  GuestRoute: GuestRouteWithChildren,
+  ResetPasswordRoute: ResetPasswordRoute,
+  VerifyRoute: VerifyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

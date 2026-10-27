@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { Screen, StubCard } from '@/components/Screen'
 
-export const Route = createFileRoute('/_tabs/plants')({
+export const Route = createFileRoute('/_authed/_tabs/plants')({
   component: PlantsScreen,
 })
 
