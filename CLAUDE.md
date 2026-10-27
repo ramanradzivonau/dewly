@@ -24,7 +24,7 @@ Vite + React 18 + TypeScript, TanStack Router + Query, Tailwind v4 with Dewly to
 - `supabase start`, `supabase db reset`, `supabase functions serve`
 
 ## Docs
-- `docs/requirements.md` — MVP requirements (Russian)
-- `docs/plan.md` — stack, data model, 8 phases (Russian)
+- `docs/requirements.md` — MVP requirements
+- `docs/plan.md` — stack, data model, 8 phases
 - `docs/design.md` — links to the screens and the design system, palette tokens
 - Before building a screen, check its layout on the design canvas linked in `docs/design.md`.
