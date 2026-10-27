@@ -5,8 +5,9 @@ import { useEffect, useState, type FormEvent } from 'react'
 import { FormProvider, useForm, useWatch, type FieldPath } from 'react-hook-form'
 import { z } from 'zod'
 
-import { FormError, FormScreen } from '@/components/FormScreen'
+import { FormCard, FormError, FormScreen } from '@/components/FormScreen'
 import { Button } from '@/components/ui/Button'
+import { ChoiceGroup } from '@/components/ui/ChoiceGroup'
 import { useCreatePlant } from '@/features/plants/api'
 import {
   PhotoNameFields,
@@ -32,6 +33,23 @@ const steps: { title: string; fields: FieldPath<PlantFormValues>[] }[] = [
   },
 ]
 
+type LastWatered = 'today' | 'few_days' | 'week' | 'unknown'
+
+const lastWateredOptions: { value: LastWatered; label: string }[] = [
+  { value: 'today', label: 'Today' },
+  { value: 'few_days', label: '3–5 days ago' },
+  { value: 'week', label: 'A week ago' },
+  { value: 'unknown', label: 'Not sure' },
+]
+
+/** Logged as a past watering, so the first task lands on the right day. */
+const lastWateredDays: Record<LastWatered, number | null> = {
+  today: 0,
+  few_days: 4,
+  week: 7,
+  unknown: null,
+}
+
 export const Route = createFileRoute('/_authed/new-plant')({
   validateSearch: z.object({
     step: z.number().int().min(1).max(steps.length).catch(1).default(1),
@@ -50,6 +68,7 @@ function NewPlantScreen() {
   const create = useCreatePlant(user.id)
   const photo = usePickedPhoto()
   const [startedAt] = useState(step)
+  const [lastWatered, setLastWatered] = useState<LastWatered>('unknown')
 
   const form = useForm<PlantFormValues>({
     resolver: zodResolver(plantSchema),
@@ -75,7 +94,7 @@ function NewPlantScreen() {
 
   const onSubmit = form.handleSubmit((values) =>
     create.mutate(
-      { values, photo: photo.blob },
+      { values, photo: photo.blob, lastWateredDaysAgo: lastWateredDays[lastWatered] },
       {
         onSuccess: ({ id }) =>
           navigate({ to: '/plants/$plantId', params: { plantId: id }, replace: true }),
@@ -138,7 +157,20 @@ function NewPlantScreen() {
         )}
         {step === 2 && <PotSoilFields />}
         {step === 3 && <PlantSpotFields />}
-        {step === 4 && <ScheduleFields />}
+        {step === 4 && (
+          <>
+            <ScheduleFields />
+            <FormCard>
+              <h2 className="text-label text-primary">When did you last water it?</h2>
+              <ChoiceGroup
+                label="Last watered"
+                options={lastWateredOptions}
+                value={lastWatered}
+                onChange={setLastWatered}
+              />
+            </FormCard>
+          </>
+        )}
         <FormError message={create.error ? 'Couldn’t add the plant. Try again.' : null} />
       </FormScreen>
     </FormProvider>

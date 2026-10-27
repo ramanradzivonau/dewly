@@ -24,6 +24,7 @@ import { Route as AuthedTabsProfileRouteImport } from './routes/_authed/_tabs/pr
 import { Route as AuthedTabsTodayRouteImport } from './routes/_authed/_tabs/today'
 import { Route as AuthedOnboardingCityRouteImport } from './routes/_authed/onboarding/city'
 import { Route as AuthedRoomsNewRouteImport } from './routes/_authed/rooms/new'
+import { Route as AuthedWaterPlantIdRouteImport } from './routes/_authed/water.$plantId'
 import { Route as AuthedPlantsPlantIdIndexRouteImport } from './routes/_authed/plants/$plantId/index'
 import { Route as AuthedPlantsPlantIdEditRouteImport } from './routes/_authed/plants/$plantId/edit'
 import { Route as AuthedRoomsRoomIdIndexRouteImport } from './routes/_authed/rooms/$roomId/index'
@@ -101,6 +102,11 @@ const AuthedRoomsNewRoute = AuthedRoomsNewRouteImport.update({
   path: '/rooms/new',
   getParentRoute: () => AuthedRoute,
 } as any)
+const AuthedWaterPlantIdRoute = AuthedWaterPlantIdRouteImport.update({
+  id: '/water/$plantId',
+  path: '/water/$plantId',
+  getParentRoute: () => AuthedRoute,
+} as any)
 const AuthedPlantsPlantIdIndexRoute =
   AuthedPlantsPlantIdIndexRouteImport.update({
     id: '/plants/$plantId/',
@@ -136,6 +142,7 @@ export interface FileRoutesByFullPath {
   '/today': typeof AuthedTabsTodayRoute
   '/onboarding/city': typeof AuthedOnboardingCityRoute
   '/rooms/new': typeof AuthedRoomsNewRoute
+  '/water/$plantId': typeof AuthedWaterPlantIdRoute
   '/plants/$plantId/edit': typeof AuthedPlantsPlantIdEditRoute
   '/rooms/$roomId/edit': typeof AuthedRoomsRoomIdEditRoute
   '/plants/$plantId/': typeof AuthedPlantsPlantIdIndexRoute
@@ -154,6 +161,7 @@ export interface FileRoutesByTo {
   '/today': typeof AuthedTabsTodayRoute
   '/onboarding/city': typeof AuthedOnboardingCityRoute
   '/rooms/new': typeof AuthedRoomsNewRoute
+  '/water/$plantId': typeof AuthedWaterPlantIdRoute
   '/plants/$plantId/edit': typeof AuthedPlantsPlantIdEditRoute
   '/rooms/$roomId/edit': typeof AuthedRoomsRoomIdEditRoute
   '/plants/$plantId': typeof AuthedPlantsPlantIdIndexRoute
@@ -176,6 +184,7 @@ export interface FileRoutesById {
   '/_authed/_tabs/today': typeof AuthedTabsTodayRoute
   '/_authed/onboarding/city': typeof AuthedOnboardingCityRoute
   '/_authed/rooms/new': typeof AuthedRoomsNewRoute
+  '/_authed/water/$plantId': typeof AuthedWaterPlantIdRoute
   '/_authed/plants/$plantId/edit': typeof AuthedPlantsPlantIdEditRoute
   '/_authed/rooms/$roomId/edit': typeof AuthedRoomsRoomIdEditRoute
   '/_authed/plants/$plantId/': typeof AuthedPlantsPlantIdIndexRoute
@@ -196,6 +205,7 @@ export interface FileRouteTypes {
     | '/today'
     | '/onboarding/city'
     | '/rooms/new'
+    | '/water/$plantId'
     | '/plants/$plantId/edit'
     | '/rooms/$roomId/edit'
     | '/plants/$plantId/'
@@ -214,6 +224,7 @@ export interface FileRouteTypes {
     | '/today'
     | '/onboarding/city'
     | '/rooms/new'
+    | '/water/$plantId'
     | '/plants/$plantId/edit'
     | '/rooms/$roomId/edit'
     | '/plants/$plantId'
@@ -235,6 +246,7 @@ export interface FileRouteTypes {
     | '/_authed/_tabs/today'
     | '/_authed/onboarding/city'
     | '/_authed/rooms/new'
+    | '/_authed/water/$plantId'
     | '/_authed/plants/$plantId/edit'
     | '/_authed/rooms/$roomId/edit'
     | '/_authed/plants/$plantId/'
@@ -356,6 +368,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedRoomsNewRouteImport
       parentRoute: typeof AuthedRoute
     }
+    '/_authed/water/$plantId': {
+      id: '/_authed/water/$plantId'
+      path: '/water/$plantId'
+      fullPath: '/water/$plantId'
+      preLoaderRoute: typeof AuthedWaterPlantIdRouteImport
+      parentRoute: typeof AuthedRoute
+    }
     '/_authed/plants/$plantId/': {
       id: '/_authed/plants/$plantId/'
       path: '/plants/$plantId'
@@ -408,6 +427,7 @@ interface AuthedRouteChildren {
   AuthedNewPlantRoute: typeof AuthedNewPlantRoute
   AuthedOnboardingCityRoute: typeof AuthedOnboardingCityRoute
   AuthedRoomsNewRoute: typeof AuthedRoomsNewRoute
+  AuthedWaterPlantIdRoute: typeof AuthedWaterPlantIdRoute
   AuthedPlantsPlantIdEditRoute: typeof AuthedPlantsPlantIdEditRoute
   AuthedRoomsRoomIdEditRoute: typeof AuthedRoomsRoomIdEditRoute
   AuthedPlantsPlantIdIndexRoute: typeof AuthedPlantsPlantIdIndexRoute
@@ -419,6 +439,7 @@ const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedNewPlantRoute: AuthedNewPlantRoute,
   AuthedOnboardingCityRoute: AuthedOnboardingCityRoute,
   AuthedRoomsNewRoute: AuthedRoomsNewRoute,
+  AuthedWaterPlantIdRoute: AuthedWaterPlantIdRoute,
   AuthedPlantsPlantIdEditRoute: AuthedPlantsPlantIdEditRoute,
   AuthedRoomsRoomIdEditRoute: AuthedRoomsRoomIdEditRoute,
   AuthedPlantsPlantIdIndexRoute: AuthedPlantsPlantIdIndexRoute,

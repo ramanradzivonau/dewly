@@ -132,3 +132,21 @@ export function HomeIcon(props: IconProps) {
     </svg>
   )
 }
+
+/** Two drops: soil still wet. */
+export function WetIcon(props: IconProps) {
+  return (
+    <svg {...base} strokeWidth={1.7} {...props}>
+      <path d="M8 4s4 4.5 4 7.5a4 4 0 0 1-8 0C4 8.5 8 4 8 4zM16 10s4 4.5 4 7.5a4 4 0 0 1-8 0c0-3 4-7.5 4-7.5z" />
+    </svg>
+  )
+}
+
+/** Crossed-out drop: soil very dry. */
+export function DryIcon(props: IconProps) {
+  return (
+    <svg {...base} strokeWidth={1.7} {...props}>
+      <path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11zM4 4l16 16" />
+    </svg>
+  )
+}
