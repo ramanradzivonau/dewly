@@ -3,7 +3,7 @@ import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { ChevronLeftIcon } from '@/components/icons'
 import { StubCard } from '@/components/Screen'
 
-export const Route = createFileRoute('/new-plant')({
+export const Route = createFileRoute('/_authed/new-plant')({
   component: NewPlantScreen,
 })
 

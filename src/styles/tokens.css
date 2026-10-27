@@ -67,6 +67,20 @@
   --text-caption: 13px;
   --text-caption--line-height: 18px;
   --text-caption--font-weight: 600;
+  /* Styles drawn on the screens that the design system's scale doesn't name. */
+  --text-wordmark: 30px; /* "dewly" next to the mark on Log in. */
+  --text-wordmark--line-height: 36px;
+  --text-wordmark--letter-spacing: -1px;
+  --text-wordmark--font-weight: 800;
+  --text-code: 24px; /* One digit of the email code. */
+  --text-code--line-height: 32px;
+  --text-code--font-weight: 800;
+  --text-input: 16px; /* Text inside inputs; 16px keeps iOS from zooming on focus. */
+  --text-input--line-height: 22px;
+  --text-input--font-weight: 500;
+  --text-field-label: 14px; /* Form field labels. */
+  --text-field-label--line-height: 20px;
+  --text-field-label--font-weight: 700;
   /* Nav bar labels: the one 12px style, the floor for text size. */
   --text-nav: 12px;
   --text-nav--line-height: 16px;

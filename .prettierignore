@@ -5,3 +5,6 @@ src/routeTree.gen.ts
 dewly-repo-starter.zip
 # Docs are edited by hand
 *.md
+.claude
+# Pasted into the Supabase dashboard as is
+supabase/templates
