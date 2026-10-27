@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form'
 import type { z } from 'zod'
 
 import { authErrorMessage } from '@/auth/errors'
+import { GoogleButton, OrWithEmail } from '@/auth/GoogleButton'
 import { signUpSchema } from '@/auth/schemas'
 import { AuthScreen, FormCard, FormError } from '@/components/AuthScreen'
 import { Button } from '@/components/ui/Button'
@@ -53,6 +54,9 @@ function SignUpScreen() {
       title="Create account"
       onSubmit={handleSubmit((values) => signUp.mutate(values))}
     >
+      <GoogleButton label="Sign up with Google" />
+      <OrWithEmail />
+
       <FormCard>
         <TextField
           label="Name"

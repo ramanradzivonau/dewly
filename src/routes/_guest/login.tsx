@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 import { authErrorMessage } from '@/auth/errors'
+import { GoogleButton, OrWithEmail } from '@/auth/GoogleButton'
 import { loginSchema } from '@/auth/schemas'
 import { AuthScreen, FormCard, FormError } from '@/components/AuthScreen'
 import { DewlyLogo } from '@/components/DewlyLogo'
@@ -21,6 +22,7 @@ export const Route = createFileRoute('/_guest/login')({
 type LoginValues = z.infer<typeof loginSchema>
 
 function LoginScreen() {
+  const { redirect } = Route.useSearch()
   const navigate = useNavigate()
   const {
     register,
@@ -52,6 +54,9 @@ function LoginScreen() {
       subtitle="Log in to see what your plants need today."
       onSubmit={handleSubmit((values) => login.mutate(values))}
     >
+      <GoogleButton label="Continue with Google" redirect={redirect} />
+      <OrWithEmail />
+
       <FormCard>
         <TextField
           label="Email"
