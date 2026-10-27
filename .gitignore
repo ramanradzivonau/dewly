@@ -17,3 +17,6 @@ supabase/.env
 .idea/
 .DS_Store
 *.log
+
+# Build caches
+*.tsbuildinfo

@@ -1,0 +1,15 @@
+@import 'tailwindcss';
+@import './tokens.css';
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-bg font-sans text-body text-ink antialiased;
+    min-height: 100dvh;
+    overscroll-behavior-y: none;
+  }
+}
