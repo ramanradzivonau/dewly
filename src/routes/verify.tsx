@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { CodeField } from '@/auth/CodeField'
 import { authErrorMessage } from '@/auth/errors'
 import { CODE_LENGTH, emailSearchSchema } from '@/auth/schemas'
-import { AuthScreen, FormError } from '@/components/AuthScreen'
+import { FormScreen, FormError } from '@/components/FormScreen'
 import { Button } from '@/components/ui/Button'
 import { supabase } from '@/lib/supabase'
 
@@ -42,7 +42,7 @@ function VerifyScreen() {
   }
 
   return (
-    <AuthScreen
+    <FormScreen
       back={{ to: '/signup', label: 'Back' }}
       step="Step 2 of 3"
       title="Check your email"
@@ -75,6 +75,6 @@ function VerifyScreen() {
       >
         Change email
       </Link>
-    </AuthScreen>
+    </FormScreen>
   )
 }

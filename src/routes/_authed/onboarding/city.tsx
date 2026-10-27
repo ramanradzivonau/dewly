@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useState, type FormEvent } from 'react'
 
-import { AuthScreen, FormCard, FormError } from '@/components/AuthScreen'
+import { FormScreen, FormCard, FormError } from '@/components/FormScreen'
 import { Button } from '@/components/ui/Button'
 import { TextField } from '@/components/ui/TextField'
 import { useUpdateProfile } from '@/features/profile/api'
@@ -60,7 +60,7 @@ function CityScreen() {
   const showList = !selected && term.length >= MIN_PLACE_QUERY
 
   return (
-    <AuthScreen
+    <FormScreen
       step="Step 3 of 3"
       title="Where do your plants live?"
       subtitle="Outdoor temperature and daylight change how often plants need water. Only the city is stored."
@@ -120,6 +120,6 @@ function CityScreen() {
       </FormCard>
 
       <FormError message={save.error ? 'Couldn’t save your city. Try again.' : null} />
-    </AuthScreen>
+    </FormScreen>
   )
 }

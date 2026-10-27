@@ -8,7 +8,7 @@ import type { z } from 'zod'
 import { CodeField } from '@/auth/CodeField'
 import { authErrorMessage } from '@/auth/errors'
 import { CODE_LENGTH, emailSearchSchema, newPasswordSchema } from '@/auth/schemas'
-import { AuthScreen, FormCard, FormError } from '@/components/AuthScreen'
+import { FormScreen, FormCard, FormError } from '@/components/FormScreen'
 import { Button } from '@/components/ui/Button'
 import { TextField } from '@/components/ui/TextField'
 import { supabase } from '@/lib/supabase'
@@ -59,7 +59,7 @@ function ResetPasswordScreen() {
   })
 
   return (
-    <AuthScreen
+    <FormScreen
       back={{ to: '/forgot-password', label: 'Back' }}
       title="Set a new password"
       subtitle={
@@ -97,6 +97,6 @@ function ResetPasswordScreen() {
         />
       </FormCard>
       <FormError message={codeError ?? (save.error ? authErrorMessage(save.error) : null)} />
-    </AuthScreen>
+    </FormScreen>
   )
 }

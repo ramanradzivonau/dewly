@@ -8,7 +8,7 @@ import type { z } from 'zod'
 import { authErrorMessage } from '@/auth/errors'
 import { GoogleButton, OrWithEmail } from '@/auth/GoogleButton'
 import { signUpSchema } from '@/auth/schemas'
-import { AuthScreen, FormCard, FormError } from '@/components/AuthScreen'
+import { FormScreen, FormCard, FormError } from '@/components/FormScreen'
 import { Button } from '@/components/ui/Button'
 import { TextField } from '@/components/ui/TextField'
 import { supabase } from '@/lib/supabase'
@@ -48,7 +48,7 @@ function SignUpScreen() {
   })
 
   return (
-    <AuthScreen
+    <FormScreen
       back={{ to: '/login', label: 'Back to log in' }}
       step="Step 1 of 3"
       title="Create account"
@@ -95,6 +95,6 @@ function SignUpScreen() {
           Log in
         </Link>
       </p>
-    </AuthScreen>
+    </FormScreen>
   )
 }

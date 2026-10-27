@@ -6,7 +6,7 @@ import type { z } from 'zod'
 
 import { authErrorMessage } from '@/auth/errors'
 import { forgotPasswordSchema } from '@/auth/schemas'
-import { AuthScreen, FormCard, FormError } from '@/components/AuthScreen'
+import { FormScreen, FormCard, FormError } from '@/components/FormScreen'
 import { Button } from '@/components/ui/Button'
 import { TextField } from '@/components/ui/TextField'
 import { supabase } from '@/lib/supabase'
@@ -34,7 +34,7 @@ function ForgotPasswordScreen() {
   })
 
   return (
-    <AuthScreen
+    <FormScreen
       back={{ to: '/login', label: 'Back to log in' }}
       title="Reset password"
       subtitle="Enter the email you signed up with and we’ll send you a 6-digit code."
@@ -56,6 +56,6 @@ function ForgotPasswordScreen() {
       <Button type="submit" loading={sendCode.isPending}>
         Send code
       </Button>
-    </AuthScreen>
+    </FormScreen>
   )
 }

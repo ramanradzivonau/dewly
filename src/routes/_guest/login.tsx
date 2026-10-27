@@ -8,7 +8,7 @@ import { z } from 'zod'
 import { authErrorMessage } from '@/auth/errors'
 import { GoogleButton, OrWithEmail } from '@/auth/GoogleButton'
 import { loginSchema } from '@/auth/schemas'
-import { AuthScreen, FormCard, FormError } from '@/components/AuthScreen'
+import { FormScreen, FormCard, FormError } from '@/components/FormScreen'
 import { DewlyLogo } from '@/components/DewlyLogo'
 import { Button } from '@/components/ui/Button'
 import { TextField } from '@/components/ui/TextField'
@@ -48,7 +48,7 @@ function LoginScreen() {
     login.error && !(login.error instanceof AuthError && login.error.code === 'email_not_confirmed')
 
   return (
-    <AuthScreen
+    <FormScreen
       top={<DewlyLogo />}
       title="Welcome back"
       subtitle="Log in to see what your plants need today."
@@ -93,6 +93,6 @@ function LoginScreen() {
           Sign up
         </Link>
       </p>
-    </AuthScreen>
+    </FormScreen>
   )
 }
