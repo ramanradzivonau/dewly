@@ -1,8 +1,8 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
 
-import { LeafIcon } from '@/components/icons'
 import { Screen } from '@/components/Screen'
+import { PlantPhoto } from '@/features/plants/PlantPhoto'
 import { roomsQuery, type RoomWithPlants } from '@/features/rooms/api'
 import { plantCount } from '@/features/rooms/format'
 
@@ -56,12 +56,13 @@ function RoomCard({ room }: { room: RoomWithPlants }) {
       </span>
       <span className="flex pl-2.5" aria-hidden>
         {shown.map((plant) => (
-          <span
+          <PlantPhoto
             key={plant.id}
-            className="-ml-2.5 flex size-11 items-center justify-center rounded-sm border-2 border-surface bg-leaf-tile text-primary-text"
-          >
-            <LeafIcon width={20} height={20} />
-          </span>
+            path={plant.cover_photo}
+            alt=""
+            iconSize={20}
+            className="-ml-2.5 size-11 rounded-sm border-2 border-surface"
+          />
         ))}
         {more > 0 && (
           <span className="-ml-2.5 flex size-11 items-center justify-center rounded-sm border-2 border-surface bg-track text-caption font-bold text-ink-muted">

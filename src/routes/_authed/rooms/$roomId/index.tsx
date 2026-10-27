@@ -1,7 +1,8 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Link, notFound } from '@tanstack/react-router'
 
-import { ChevronLeftIcon, LeafIcon, PlusIcon } from '@/components/icons'
+import { ChevronLeftIcon, ChevronRightIcon, PlusIcon } from '@/components/icons'
+import { PlantPhoto } from '@/features/plants/PlantPhoto'
 import { roomQuery } from '@/features/rooms/api'
 import { lightLabels, windowLabel } from '@/features/rooms/options'
 import { plantCount } from '@/features/rooms/format'
@@ -70,14 +71,16 @@ function RoomScreen() {
       {room.plants.length > 0 ? (
         <ul className="flex flex-col rounded-lg border border-border bg-surface px-4 py-1">
           {room.plants.map((plant) => (
-            <li
-              key={plant.id}
-              className="flex items-center gap-3 border-b border-divider py-3 last:border-b-0"
-            >
-              <span className="flex size-13 shrink-0 items-center justify-center rounded-md bg-leaf-tile text-primary-text">
-                <LeafIcon />
-              </span>
-              <span className="flex-1 text-body-strong text-ink">{plant.nickname}</span>
+            <li key={plant.id} className="border-b border-divider last:border-b-0">
+              <Link
+                to="/plants/$plantId"
+                params={{ plantId: plant.id }}
+                className="flex items-center gap-3 py-3"
+              >
+                <PlantPhoto path={plant.cover_photo} alt="" className="size-13 rounded-md" />
+                <span className="flex-1 text-body-strong text-ink">{plant.nickname}</span>
+                <ChevronRightIcon width={18} height={18} className="text-primary" />
+              </Link>
             </li>
           ))}
         </ul>
@@ -89,6 +92,7 @@ function RoomScreen() {
 
       <Link
         to="/new-plant"
+        search={{ roomId }}
         className="flex min-h-14 items-center justify-center gap-2 rounded-pill bg-primary px-6 text-body-strong text-on-primary active:bg-primary-hover"
       >
         <PlusIcon width={20} height={20} />
