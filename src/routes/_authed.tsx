@@ -6,6 +6,8 @@ export const Route = createFileRoute('/_authed')({
     if (!context.session) {
       throw redirect({ to: '/login', search: { redirect: location.href } })
     }
+    // Child routes get a non-null user in their context.
+    return { user: context.session.user }
   },
   component: Outlet,
 })

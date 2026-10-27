@@ -1,8 +1,9 @@
-import { useMutation } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
+import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
+import { createFileRoute, Link } from '@tanstack/react-router'
 
 import { Screen, StubCard } from '@/components/Screen'
 import { Button } from '@/components/ui/Button'
+import { profileQuery } from '@/features/profile/api'
 import { supabase } from '@/lib/supabase'
 
 export const Route = createFileRoute('/_authed/_tabs/profile')({
@@ -10,9 +11,9 @@ export const Route = createFileRoute('/_authed/_tabs/profile')({
 })
 
 function ProfileScreen() {
-  const { session } = Route.useRouteContext()
-  const user = session?.user
-  const name = (user?.user_metadata as { display_name?: string } | undefined)?.display_name
+  const { user } = Route.useRouteContext()
+  // Loaded by the _tabs guard, so this never suspends on first render.
+  const { data: profile } = useSuspenseQuery(profileQuery(user.id))
 
   // The _authed guard sends the user to Log in once the session is gone.
   const logOut = useMutation({
@@ -23,11 +24,19 @@ function ProfileScreen() {
   })
 
   return (
-    <Screen title="Profile" subtitle={name ? `Signed in as ${name}` : undefined}>
+    <Screen
+      title="Profile"
+      subtitle={profile.display_name ? `Signed in as ${profile.display_name}` : undefined}
+    >
       <StubCard>
-        {user?.email}
+        {user.email}
         <br />
-        City, reminder times and fertilizers will live here.
+        City: {profile.city}{' '}
+        <Link to="/onboarding/city" className="font-bold text-primary-text">
+          Change
+        </Link>
+        <br />
+        Reminder times and fertilizers will live here.
       </StubCard>
       <Button variant="secondary" loading={logOut.isPending} onClick={() => logOut.mutate()}>
         Log out
