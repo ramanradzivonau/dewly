@@ -23,6 +23,9 @@ import { Route as AuthedTabsPlantsRouteImport } from './routes/_authed/_tabs/pla
 import { Route as AuthedTabsProfileRouteImport } from './routes/_authed/_tabs/profile'
 import { Route as AuthedTabsTodayRouteImport } from './routes/_authed/_tabs/today'
 import { Route as AuthedOnboardingCityRouteImport } from './routes/_authed/onboarding/city'
+import { Route as AuthedRoomsNewRouteImport } from './routes/_authed/rooms/new'
+import { Route as AuthedRoomsRoomIdIndexRouteImport } from './routes/_authed/rooms/$roomId/index'
+import { Route as AuthedRoomsRoomIdEditRouteImport } from './routes/_authed/rooms/$roomId/edit'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -91,6 +94,21 @@ const AuthedOnboardingCityRoute = AuthedOnboardingCityRouteImport.update({
   path: '/onboarding/city',
   getParentRoute: () => AuthedRoute,
 } as any)
+const AuthedRoomsNewRoute = AuthedRoomsNewRouteImport.update({
+  id: '/rooms/new',
+  path: '/rooms/new',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedRoomsRoomIdIndexRoute = AuthedRoomsRoomIdIndexRouteImport.update({
+  id: '/rooms/$roomId/',
+  path: '/rooms/$roomId/',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedRoomsRoomIdEditRoute = AuthedRoomsRoomIdEditRouteImport.update({
+  id: '/rooms/$roomId/edit',
+  path: '/rooms/$roomId/edit',
+  getParentRoute: () => AuthedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -104,6 +122,9 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AuthedTabsProfileRoute
   '/today': typeof AuthedTabsTodayRoute
   '/onboarding/city': typeof AuthedOnboardingCityRoute
+  '/rooms/new': typeof AuthedRoomsNewRoute
+  '/rooms/$roomId/edit': typeof AuthedRoomsRoomIdEditRoute
+  '/rooms/$roomId/': typeof AuthedRoomsRoomIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -117,6 +138,9 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthedTabsProfileRoute
   '/today': typeof AuthedTabsTodayRoute
   '/onboarding/city': typeof AuthedOnboardingCityRoute
+  '/rooms/new': typeof AuthedRoomsNewRoute
+  '/rooms/$roomId/edit': typeof AuthedRoomsRoomIdEditRoute
+  '/rooms/$roomId': typeof AuthedRoomsRoomIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -134,6 +158,9 @@ export interface FileRoutesById {
   '/_authed/_tabs/profile': typeof AuthedTabsProfileRoute
   '/_authed/_tabs/today': typeof AuthedTabsTodayRoute
   '/_authed/onboarding/city': typeof AuthedOnboardingCityRoute
+  '/_authed/rooms/new': typeof AuthedRoomsNewRoute
+  '/_authed/rooms/$roomId/edit': typeof AuthedRoomsRoomIdEditRoute
+  '/_authed/rooms/$roomId/': typeof AuthedRoomsRoomIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -149,6 +176,9 @@ export interface FileRouteTypes {
     | '/profile'
     | '/today'
     | '/onboarding/city'
+    | '/rooms/new'
+    | '/rooms/$roomId/edit'
+    | '/rooms/$roomId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -162,6 +192,9 @@ export interface FileRouteTypes {
     | '/profile'
     | '/today'
     | '/onboarding/city'
+    | '/rooms/new'
+    | '/rooms/$roomId/edit'
+    | '/rooms/$roomId'
   id:
     | '__root__'
     | '/'
@@ -178,6 +211,9 @@ export interface FileRouteTypes {
     | '/_authed/_tabs/profile'
     | '/_authed/_tabs/today'
     | '/_authed/onboarding/city'
+    | '/_authed/rooms/new'
+    | '/_authed/rooms/$roomId/edit'
+    | '/_authed/rooms/$roomId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -288,6 +324,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedOnboardingCityRouteImport
       parentRoute: typeof AuthedRoute
     }
+    '/_authed/rooms/new': {
+      id: '/_authed/rooms/new'
+      path: '/rooms/new'
+      fullPath: '/rooms/new'
+      preLoaderRoute: typeof AuthedRoomsNewRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/rooms/$roomId/': {
+      id: '/_authed/rooms/$roomId/'
+      path: '/rooms/$roomId'
+      fullPath: '/rooms/$roomId/'
+      preLoaderRoute: typeof AuthedRoomsRoomIdIndexRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/rooms/$roomId/edit': {
+      id: '/_authed/rooms/$roomId/edit'
+      path: '/rooms/$roomId/edit'
+      fullPath: '/rooms/$roomId/edit'
+      preLoaderRoute: typeof AuthedRoomsRoomIdEditRouteImport
+      parentRoute: typeof AuthedRoute
+    }
   }
 }
 
@@ -311,12 +368,18 @@ interface AuthedRouteChildren {
   AuthedTabsRoute: typeof AuthedTabsRouteWithChildren
   AuthedNewPlantRoute: typeof AuthedNewPlantRoute
   AuthedOnboardingCityRoute: typeof AuthedOnboardingCityRoute
+  AuthedRoomsNewRoute: typeof AuthedRoomsNewRoute
+  AuthedRoomsRoomIdEditRoute: typeof AuthedRoomsRoomIdEditRoute
+  AuthedRoomsRoomIdIndexRoute: typeof AuthedRoomsRoomIdIndexRoute
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedTabsRoute: AuthedTabsRouteWithChildren,
   AuthedNewPlantRoute: AuthedNewPlantRoute,
   AuthedOnboardingCityRoute: AuthedOnboardingCityRoute,
+  AuthedRoomsNewRoute: AuthedRoomsNewRoute,
+  AuthedRoomsRoomIdEditRoute: AuthedRoomsRoomIdEditRoute,
+  AuthedRoomsRoomIdIndexRoute: AuthedRoomsRoomIdIndexRoute,
 }
 
 const AuthedRouteWithChildren =

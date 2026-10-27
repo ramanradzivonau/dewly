@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query'
 
 // Google's own "G" mark, kept as an asset: brand guidelines require its colors.
 import googleMark from '@/assets/google-g.svg'
-import { FormError } from '@/components/AuthScreen'
+import { FormError } from '@/components/FormScreen'
 import { Button } from '@/components/ui/Button'
 import { supabase } from '@/lib/supabase'
 

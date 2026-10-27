@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import { FormCard } from '@/components/AuthScreen'
+import { FormCard } from '@/components/FormScreen'
 import { OtpInput } from '@/components/ui/OtpInput'
 
 const RESEND_AFTER_SECONDS = 60

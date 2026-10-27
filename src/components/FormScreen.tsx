@@ -1,15 +1,22 @@
 import { Link, type LinkProps } from '@tanstack/react-router'
 import type { FormEventHandler, ReactNode } from 'react'
 
-import { ChevronLeftIcon } from './icons'
+import { ChevronLeftIcon, CloseIcon } from './icons'
 
-type AuthScreenProps = {
+type FormScreenProps = {
   title: string
   subtitle?: ReactNode
   /** "Step 1 of 3" style label above the title. */
   step?: string
   /** Where the round back button goes; no button when omitted. */
-  back?: { to: LinkProps['to']; search?: LinkProps['search']; label: string }
+  back?: {
+    to: LinkProps['to']
+    params?: LinkProps['params']
+    search?: LinkProps['search']
+    label: string
+    /** ✕ for screens that cancel a flow (New room), chevron otherwise. */
+    icon?: 'back' | 'close'
+  }
   /** Content above the header, e.g. the logo on Log in. */
   top?: ReactNode
   /** Sticky bottom bar with the primary action (Verify, Save). */
@@ -18,8 +25,8 @@ type AuthScreenProps = {
   children: ReactNode
 }
 
-/** Layout for the signed-out screens: Log in, Sign up, Verify, password reset. */
-export function AuthScreen({
+/** Layout for form screens: sign-in flows, onboarding, room and plant forms. */
+export function FormScreen({
   title,
   subtitle,
   step,
@@ -28,7 +35,7 @@ export function AuthScreen({
   bottomBar,
   onSubmit,
   children,
-}: AuthScreenProps) {
+}: FormScreenProps) {
   return (
     <form
       noValidate
@@ -38,11 +45,16 @@ export function AuthScreen({
       {back && (
         <Link
           to={back.to}
+          params={back.params}
           search={back.search}
           aria-label={back.label}
           className="flex size-11 items-center justify-center self-start rounded-pill border border-border bg-surface text-primary"
         >
-          <ChevronLeftIcon width={20} height={20} />
+          {back.icon === 'close' ? (
+            <CloseIcon width={20} height={20} />
+          ) : (
+            <ChevronLeftIcon width={20} height={20} />
+          )}
         </Link>
       )}
       {top}
