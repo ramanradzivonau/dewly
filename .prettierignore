@@ -1,0 +1,7 @@
+dist
+dev-dist
+package-lock.json
+src/routeTree.gen.ts
+dewly-repo-starter.zip
+# Docs are edited by hand
+*.md

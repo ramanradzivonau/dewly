@@ -1,0 +1,91 @@
+/*
+ * Dewly design tokens: Deep palette.
+ * Source of truth: the Dewly design system (see docs/design.md).
+ *
+ * Declared in a Tailwind `@theme` block, so each token is both a CSS variable on :root
+ * (`var(--color-primary)`) and a utility (`bg-primary`, `text-ink`, `rounded-lg`, `shadow-float`).
+ * Tailwind's default palette, radii, shadows and text sizes are cleared: only Dewly tokens exist.
+ */
+@theme {
+  --color-*: initial;
+  --radius-*: initial;
+  --shadow-*: initial;
+  --text-*: initial;
+  --font-*: initial;
+
+  /* Color */
+  --color-bg: #e9efe8; /* Page background behind every screen. */
+  --color-bg-raised: #f4f7f3; /* Sticky bottom bars, input fill on white cards. */
+  --color-surface: #ffffff; /* Cards, sections, option tiles, inputs, nav bar. */
+  --color-track: #d2decf; /* Segmented control and switch tracks, soft buttons. */
+  --color-border: #c9d6cb; /* Card and tile borders, unselected option rings. */
+  --color-border-strong: #b5c6b8; /* Outlined buttons on cream, Google button border. */
+  --color-divider: #e3ebe3; /* Hairlines between list rows inside a card. */
+  --color-ink: #0f1a14; /* Primary text on bg and surface. */
+  --color-ink-muted: #3f4f45; /* Subtitles and secondary copy. */
+  --color-ink-subtle: #4c5c52; /* Meta lines, captions, units. */
+  --color-primary: #0e3a25; /* Headings, primary buttons, selected states, nav active. */
+  --color-primary-hover: #082a1a; /* Pressed / hover state of primary. */
+  --color-primary-text: #1f5a3a; /* Inline links. */
+  --color-primary-soft: #d3e5d7; /* Selected option fill, nav active pill. */
+  --color-on-primary: #ffffff; /* Text and icons on primary. */
+  --color-leaf-tile: #bfd8c5; /* Placeholder behind plant photos and avatars. */
+  --color-water: #1b4a5e; /* Watering. */
+  --color-water-soft: #dce7ec; /* Water icon backgrounds. */
+  --color-fert: #7a3f0a; /* Fertilizer text and icons on fert-soft. */
+  --color-fert-soft: #f3dfc4; /* Fertilizer chips and cards. */
+  --color-fert-dot: #b9772a; /* Fertilizer marker in the calendar. */
+  --color-danger: #962d14; /* Overdue, destructive, toxic. */
+  --color-danger-strong: #7a2410; /* Danger text on danger-soft. */
+  --color-danger-soft: #f5d6ce; /* Overdue badge fill, toxicity chips. */
+  --color-terracotta: #c46a42; /* Pot illustrations only, never text. */
+  --color-logo-light: #ddefc9; /* Dew drop in the logo mark. */
+
+  /* Type: Manrope, 500–800 */
+  --font-sans: 'Manrope Variable', Manrope, system-ui, -apple-system, sans-serif;
+
+  --text-display: 36px;
+  --text-display--line-height: 40px;
+  --text-display--letter-spacing: -0.6px;
+  --text-display--font-weight: 800;
+  --text-title: 32px;
+  --text-title--line-height: 36px;
+  --text-title--letter-spacing: -0.5px;
+  --text-title--font-weight: 800;
+  --text-section: 22px;
+  --text-section--line-height: 28px;
+  --text-section--font-weight: 800;
+  --text-label: 16px;
+  --text-label--line-height: 22px;
+  --text-label--font-weight: 800;
+  --text-body-strong: 17px;
+  --text-body-strong--line-height: 24px;
+  --text-body-strong--font-weight: 700;
+  --text-body: 15px;
+  --text-body--line-height: 22px;
+  --text-body--font-weight: 500;
+  --text-caption: 13px;
+  --text-caption--line-height: 18px;
+  --text-caption--font-weight: 600;
+  /* Nav bar labels: the one 12px style, the floor for text size. */
+  --text-nav: 12px;
+  --text-nav--line-height: 16px;
+
+  /* Spacing: Tailwind's 4px scale, with the design system's named steps pinned. */
+  --spacing: 4px;
+  --spacing-1: 4px; /* Inside chips, between title and subtitle. */
+  --spacing-2: 8px; /* Between chips and option tiles. */
+  --spacing-3: 12px; /* Between rows inside a card. */
+  --spacing-4: 16px; /* Screen side padding, gap between cards. */
+  --spacing-5: 20px; /* Card padding. */
+  --spacing-7: 56px; /* Top safe area on every screen. */
+
+  /* Radius */
+  --radius-sm: 12px; /* Inputs inside cards, small icon tiles. */
+  --radius-md: 16px; /* Chips, option buttons, inputs. */
+  --radius-lg: 24px; /* Cards and sections. */
+  --radius-pill: 999px; /* Buttons, tabs, avatars, nav bar. */
+
+  /* Shadow */
+  --shadow-float: 0 8px 24px rgba(15, 26, 20, 0.12); /* Floating nav bar and + button only. */
+}

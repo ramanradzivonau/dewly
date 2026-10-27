@@ -49,7 +49,7 @@ iPhone PWA ──► Supabase (Auth · Postgres · Storage)
 
 ## Getting started
 
-Requires Node 20+ and the [Supabase CLI](https://supabase.com/docs/guides/cli).
+Requires Node 22.12+ (`.node-version` pins 24) and the [Supabase CLI](https://supabase.com/docs/guides/cli).
 
 ```bash
 git clone https://github.com/<you>/dewly.git
