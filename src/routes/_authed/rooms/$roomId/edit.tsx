@@ -1,4 +1,4 @@
-import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 
@@ -13,6 +13,8 @@ import {
   useUpdateRoom,
   type RoomWithPlants,
 } from '@/features/rooms/api'
+import { tasksKey } from '@/features/care/keys'
+import { aiSchedules, recalculate } from '@/features/recommend/api'
 import { plantCount } from '@/features/rooms/format'
 import { RoomForm } from '@/features/rooms/RoomForm'
 
@@ -25,6 +27,7 @@ export const Route = createFileRoute('/_authed/rooms/$roomId/edit')({
 })
 
 function EditRoomScreen() {
+  const queryClient = useQueryClient()
   const { roomId } = Route.useParams()
   const navigate = useNavigate()
   const { data: room } = useSuspenseQuery(roomQuery(roomId))
@@ -48,7 +51,14 @@ function EditRoomScreen() {
       error={update.error ? 'Couldn’t save the room. Try again.' : null}
       onSubmit={(values) =>
         update.mutate(values, {
-          onSuccess: () => navigate({ to: '/rooms/$roomId', params: { roomId }, replace: true }),
+          onSuccess: () => {
+            // Light and climate feed every plant here; refresh their AI schedules.
+            void aiSchedules({ roomId })
+              .then(recalculate)
+              .then(() => queryClient.invalidateQueries({ queryKey: tasksKey }))
+              .catch(() => undefined)
+            return navigate({ to: '/rooms/$roomId', params: { roomId }, replace: true })
+          },
         })
       }
     >

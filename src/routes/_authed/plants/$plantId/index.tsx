@@ -188,6 +188,9 @@ function AiActions({ plant }: { plant: Plant }) {
           {explanation}
         </p>
       )}
+      {plant.schedule?.tuning_note && (
+        <p className="text-caption font-medium text-ink-subtle">{plant.schedule.tuning_note}</p>
+      )}
       {custom && (
         <p className="text-caption font-medium text-ink-subtle">
           You set this schedule by hand, so recalculation leaves it alone.

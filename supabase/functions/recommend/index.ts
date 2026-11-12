@@ -15,10 +15,11 @@ import { cors, json } from '../_shared/http.ts'
 import { Recommendation, recommendationJsonSchema } from './schema.ts'
 
 const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models'
-// Google's aliases for the current models. Flash-Lite answers a schedule quickly even under
-// load; Flash is the backup. The client waits 60 s, so both attempts fit inside it.
-const DEFAULT_MODEL = 'gemini-flash-lite-latest'
-const FALLBACK_MODEL = 'gemini-flash-latest'
+// Tried in order; override with the GEMINI_MODELS secret ("model-a,model-b"). The aliases
+// follow Google's current Flash-Lite and Flash; 3.8 Flash is the model Google points new keys
+// to, with its own capacity. Three attempts fit in the client's 100 s and the runtime's 150 s.
+const DEFAULT_MODELS = 'gemini-flash-lite-latest,gemini-3.8-flash,gemini-flash-latest'
+const ATTEMPT_TIMEOUT_MS = 28_000
 const WEATHER_TIMEOUT_MS = 8_000
 
 const Draft = z.object({
@@ -45,6 +46,57 @@ const Body = z.union([
 
 const roomColumns =
   'light, window_dir, winter_min, winter_max, summer_min, summer_max, humidity_min, humidity_max, drafts'
+
+type ScheduleRow = { source: string; water_days_warm: number; water_days_cold: number }
+
+const HISTORY_DAYS = 120
+const DAY_MS = 86_400_000
+
+/**
+ * How this pot actually behaves: real gaps between waterings and the last soil answers.
+ * It tells Gemini more than any rule of thumb, e.g. soil that stays wet for two weeks.
+ */
+async function careHistory(
+  db: ReturnType<typeof createClient>,
+  plantId: string,
+  schedule: ScheduleRow | null,
+) {
+  const since = new Date(Date.now() - HISTORY_DAYS * DAY_MS).toISOString()
+  const { data } = await db
+    .from('care_events')
+    .select('type, at, soil_state, postpone_days')
+    .eq('plant_id', plantId)
+    .in('type', ['water', 'postpone'])
+    .gte('at', since)
+    .order('at')
+  const events = (data ?? []) as {
+    type: 'water' | 'postpone'
+    at: string
+    soil_state: string | null
+    postpone_days: number | null
+  }[]
+  const waterings = events.filter((e) => e.type === 'water').map((e) => Date.parse(e.at))
+  const gaps = waterings.slice(1).map((t, i) => (t - waterings[i]!) / DAY_MS)
+  return {
+    period_days: HISTORY_DAYS,
+    waterings: waterings.length,
+    average_days_between_waterings: gaps.length
+      ? Math.round((gaps.reduce((a, b) => a + b, 0) / gaps.length) * 10) / 10
+      : null,
+    // Newest last: "wet" means the user postponed because the soil was still wet.
+    recent_soil_answers: events
+      .filter((e) => e.type === 'postpone' || e.soil_state)
+      .slice(-8)
+      .map((e) => (e.type === 'postpone' ? `wet (+${e.postpone_days} d)` : e.soil_state)),
+    current_schedule: schedule
+      ? {
+          water_days_warm: schedule.water_days_warm,
+          water_days_cold: schedule.water_days_cold,
+          set_by: schedule.source === 'ai' ? 'ai' : 'user',
+        }
+      : null,
+  }
+}
 
 type Room = {
   light: string
@@ -106,31 +158,32 @@ Watering intervals are for a full soak until water drains from the bottom, never
 Account for light, pot material and size, drainage, soil, radiators or AC, drafts, humidity,
 room temperatures, outdoor temperature and day length.
 If the species is unknown, give safe general advice and say so in the explanation.
+When care history is given, weigh it heavily: real intervals and soil answers show how fast
+this particular pot dries. Repeated "wet" means water less often; repeated "very_dry" means more
+often. The current schedule is context, not a constraint. Mention the history in the
+explanation when it changed your numbers.
 Write in plain English for a home gardener.`
 
-/** 503 (overloaded) and 429 (rate limit) pass; anything else won't fix itself by retrying. */
-const RETRYABLE = new Set([429, 500, 503])
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 async function askGemini(input: unknown) {
   const key = Deno.env.get('GEMINI_API_KEY')
   if (!key) throw new Error('GEMINI_API_KEY is not set')
-  const model = Deno.env.get('GEMINI_MODEL') ?? DEFAULT_MODEL
-  const fallback = Deno.env.get('GEMINI_FALLBACK_MODEL') ?? FALLBACK_MODEL
+  const models = (Deno.env.get('GEMINI_MODELS') ?? DEFAULT_MODELS)
+    .split(',')
+    .map((m) => m.trim())
+    .filter(Boolean)
 
-  // A slow or busy model gets one chance; then the other one.
-  const attempts = [
-    { model, delay: 0, timeout: 20_000 },
-    { model: fallback, delay: 1_000, timeout: 30_000 },
-  ]
+  // Each model gets one chance, then the next: models are served separately, so when one
+  // is overloaded, slow, missing on this key (404) or rejects the request, another may not.
   let lastStatus = 0
-  for (const attempt of attempts) {
-    await sleep(attempt.delay)
+  for (const [i, model] of models.entries()) {
+    if (i > 0) await sleep(1_000)
     let res: Response
     try {
-      res = await fetch(`${GEMINI_URL}/${attempt.model}:generateContent`, {
+      res = await fetch(`${GEMINI_URL}/${model}:generateContent`, {
         method: 'POST',
-        signal: AbortSignal.timeout(attempt.timeout),
+        signal: AbortSignal.timeout(ATTEMPT_TIMEOUT_MS),
         headers: { 'x-goog-api-key': key, 'Content-Type': 'application/json' },
         body: JSON.stringify({
           systemInstruction: { parts: [{ text: SYSTEM }] },
@@ -143,20 +196,25 @@ async function askGemini(input: unknown) {
         }),
       })
     } catch (e) {
-      // Timed out or the network dropped: try the next model.
-      console.error('Gemini', attempt.model, e instanceof Error ? e.name : e)
+      // Timed out or the network dropped.
+      console.error('Gemini', model, e instanceof Error ? e.name : e)
       continue
     }
-    if (res.ok) {
-      const data = (await res.json()) as {
-        candidates?: { content?: { parts?: { text?: string }[] } }[]
-      }
-      const text = data.candidates?.[0]?.content?.parts?.map((p) => p.text ?? '').join('') ?? ''
-      return Recommendation.parse(JSON.parse(text))
+    if (!res.ok) {
+      lastStatus = res.status
+      console.error('Gemini', model, res.status, await res.text())
+      continue
     }
-    lastStatus = res.status
-    console.error('Gemini', attempt.model, res.status, await res.text())
-    if (!RETRYABLE.has(res.status)) break
+    const data = (await res.json()) as {
+      candidates?: { content?: { parts?: { text?: string }[] } }[]
+    }
+    const text = data.candidates?.[0]?.content?.parts?.map((p) => p.text ?? '').join('') ?? ''
+    try {
+      return Recommendation.parse(JSON.parse(text))
+    } catch (e) {
+      // An answer that doesn't fit the schema is as good as none.
+      console.error('Gemini', model, 'invalid answer', e instanceof Error ? e.message : e)
+    }
   }
   throw new Error(lastStatus === 429 ? 'rate_limited' : 'gemini_failed')
 }
@@ -189,13 +247,18 @@ Deno.serve(async (req) => {
   // Gather the plant (saved or draft) and its room, through RLS.
   let plant: Draft
   let room: Room
-  let saved: { id: string; species_id: string | null; source: string | null } | null = null
+  let saved: {
+    id: string
+    species_id: string | null
+    source: string | null
+    schedule: ScheduleRow | null
+  } | null = null
   if ('plant_id' in body) {
     const { data, error } = await asUser
       .from('plants')
       .select(
         `id, species_id, pot_type, pot_diameter_cm, drainage, soil, repotted_on, height_cm, born_on, near, grow_light_hours, room_id,
-         room:rooms (${roomColumns}), species (scientific_name, common_name), schedule:care_schedules (source)`,
+         room:rooms (${roomColumns}), species (scientific_name, common_name), schedule:care_schedules (source, water_days_warm, water_days_cold)`,
       )
       .eq('id', body.plant_id)
       .maybeSingle()
@@ -208,12 +271,17 @@ Deno.serve(async (req) => {
       id: string
       species_id: string | null
       room: Room
-      schedule: { source: string } | { source: string }[] | null
+      schedule: ScheduleRow | ScheduleRow[] | null
     }
     const schedule = Array.isArray(row.schedule) ? row.schedule[0] : row.schedule
     plant = row
     room = row.room
-    saved = { id: row.id, species_id: row.species_id, source: schedule?.source ?? null }
+    saved = {
+      id: row.id,
+      species_id: row.species_id,
+      source: schedule?.source ?? null,
+      schedule: schedule ?? null,
+    }
   } else {
     plant = body.draft
     const { data, error } = await asUser
@@ -259,6 +327,8 @@ Deno.serve(async (req) => {
     },
     room,
     conditions,
+    // A plant not saved yet has no history.
+    care_history: saved ? await careHistory(asUser, saved.id, saved.schedule) : null,
   }
 
   const hash = await sha256(JSON.stringify(input))
@@ -295,6 +365,10 @@ Deno.serve(async (req) => {
       progress_days: recommendation.progress_days,
       tip: recommendation.tip,
       explanation: recommendation.explanation,
+      // Gemini saw the soil answers in the history, so the quick nudge starts over.
+      water_tune_pct: 0,
+      tuning_note: null,
+      tuned_at: now.toISOString(),
       source: 'ai',
       computed_at: now.toISOString(),
     }

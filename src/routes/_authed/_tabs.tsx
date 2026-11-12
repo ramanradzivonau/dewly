@@ -2,6 +2,7 @@ import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 
 import { NavBar } from '@/components/NavBar'
 import { profileQuery } from '@/features/profile/api'
+import { useMonthlyRecalc } from '@/features/recommend/useMonthlyRecalc'
 
 export const Route = createFileRoute('/_authed/_tabs')({
   // The tabs need a city (weather, day length); finish onboarding first.
@@ -13,6 +14,7 @@ export const Route = createFileRoute('/_authed/_tabs')({
 })
 
 function TabsLayout() {
+  useMonthlyRecalc()
   return (
     <>
       <Outlet />
