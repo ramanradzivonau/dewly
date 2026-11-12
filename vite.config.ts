@@ -40,6 +40,8 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
+        // Push and notification taps live in a plain script next to the generated worker.
+        importScripts: ['push-sw.js'],
       },
     }),
   ],

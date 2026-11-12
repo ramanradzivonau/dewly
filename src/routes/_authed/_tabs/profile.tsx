@@ -1,7 +1,7 @@
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
 
-import { ChevronRightIcon, FlaskIcon, PlusIcon } from '@/components/icons'
+import { BellIcon, ChevronRightIcon, FlaskIcon, PlusIcon } from '@/components/icons'
 import { Screen, StubCard } from '@/components/Screen'
 import { Button } from '@/components/ui/Button'
 import { fertilizersQuery, fertilizerTypeOptions, formatDose } from '@/features/fertilizers/api'
@@ -38,9 +38,22 @@ function ProfileScreen() {
         <Link to="/onboarding/city" className="font-bold text-primary-text">
           Change
         </Link>
-        <br />
-        Reminder times will live here.
       </StubCard>
+      <Link
+        to="/reminders"
+        className="flex min-h-16 items-center gap-3.5 rounded-lg bg-surface px-5 py-3"
+      >
+        <span className="flex size-12 shrink-0 items-center justify-center rounded-pill bg-primary text-logo-light">
+          <BellIcon width={22} height={22} />
+        </span>
+        <span className="flex flex-1 flex-col gap-0.5">
+          <span className="text-label font-semibold text-ink">Reminders</span>
+          <span className="text-caption font-medium text-ink-subtle">
+            {profile.reminder_times.join(' · ')}
+          </span>
+        </span>
+        <ChevronRightIcon width={20} height={20} className="text-primary" />
+      </Link>
       <Fertilizers />
       <Button variant="secondary" loading={logOut.isPending} onClick={() => logOut.mutate()}>
         Log out

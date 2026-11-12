@@ -16,6 +16,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as VerifyRouteImport } from './routes/verify'
 import { Route as AuthedTabsRouteImport } from './routes/_authed/_tabs'
 import { Route as AuthedNewPlantRouteImport } from './routes/_authed/new-plant'
+import { Route as AuthedRemindersRouteImport } from './routes/_authed/reminders'
 import { Route as GuestForgotPasswordRouteImport } from './routes/_guest/forgot-password'
 import { Route as GuestLoginRouteImport } from './routes/_guest/login'
 import { Route as GuestSignupRouteImport } from './routes/_guest/signup'
@@ -64,6 +65,11 @@ const AuthedTabsRoute = AuthedTabsRouteImport.update({
 const AuthedNewPlantRoute = AuthedNewPlantRouteImport.update({
   id: '/new-plant',
   path: '/new-plant',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedRemindersRoute = AuthedRemindersRouteImport.update({
+  id: '/reminders',
+  path: '/reminders',
   getParentRoute: () => AuthedRoute,
 } as any)
 const GuestForgotPasswordRoute = GuestForgotPasswordRouteImport.update({
@@ -161,6 +167,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/verify': typeof VerifyRoute
   '/new-plant': typeof AuthedNewPlantRoute
+  '/reminders': typeof AuthedRemindersRoute
   '/forgot-password': typeof GuestForgotPasswordRoute
   '/login': typeof GuestLoginRoute
   '/signup': typeof GuestSignupRoute
@@ -184,6 +191,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/verify': typeof VerifyRoute
   '/new-plant': typeof AuthedNewPlantRoute
+  '/reminders': typeof AuthedRemindersRoute
   '/forgot-password': typeof GuestForgotPasswordRoute
   '/login': typeof GuestLoginRoute
   '/signup': typeof GuestSignupRoute
@@ -211,6 +219,7 @@ export interface FileRoutesById {
   '/verify': typeof VerifyRoute
   '/_authed/_tabs': typeof AuthedTabsRouteWithChildren
   '/_authed/new-plant': typeof AuthedNewPlantRoute
+  '/_authed/reminders': typeof AuthedRemindersRoute
   '/_guest/forgot-password': typeof GuestForgotPasswordRoute
   '/_guest/login': typeof GuestLoginRoute
   '/_guest/signup': typeof GuestSignupRoute
@@ -236,6 +245,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/verify'
     | '/new-plant'
+    | '/reminders'
     | '/forgot-password'
     | '/login'
     | '/signup'
@@ -259,6 +269,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/verify'
     | '/new-plant'
+    | '/reminders'
     | '/forgot-password'
     | '/login'
     | '/signup'
@@ -285,6 +296,7 @@ export interface FileRouteTypes {
     | '/verify'
     | '/_authed/_tabs'
     | '/_authed/new-plant'
+    | '/_authed/reminders'
     | '/_guest/forgot-password'
     | '/_guest/login'
     | '/_guest/signup'
@@ -361,6 +373,13 @@ declare module '@tanstack/react-router' {
       path: '/new-plant'
       fullPath: '/new-plant'
       preLoaderRoute: typeof AuthedNewPlantRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/reminders': {
+      id: '/_authed/reminders'
+      path: '/reminders'
+      fullPath: '/reminders'
+      preLoaderRoute: typeof AuthedRemindersRouteImport
       parentRoute: typeof AuthedRoute
     }
     '/_guest/forgot-password': {
@@ -504,6 +523,7 @@ const AuthedTabsRouteWithChildren = AuthedTabsRoute._addFileChildren(
 interface AuthedRouteChildren {
   AuthedTabsRoute: typeof AuthedTabsRouteWithChildren
   AuthedNewPlantRoute: typeof AuthedNewPlantRoute
+  AuthedRemindersRoute: typeof AuthedRemindersRoute
   AuthedFertilizersFertilizerIdRoute: typeof AuthedFertilizersFertilizerIdRoute
   AuthedFertilizersNewRoute: typeof AuthedFertilizersNewRoute
   AuthedOnboardingCityRoute: typeof AuthedOnboardingCityRoute
@@ -520,6 +540,7 @@ interface AuthedRouteChildren {
 const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedTabsRoute: AuthedTabsRouteWithChildren,
   AuthedNewPlantRoute: AuthedNewPlantRoute,
+  AuthedRemindersRoute: AuthedRemindersRoute,
   AuthedFertilizersFertilizerIdRoute: AuthedFertilizersFertilizerIdRoute,
   AuthedFertilizersNewRoute: AuthedFertilizersNewRoute,
   AuthedOnboardingCityRoute: AuthedOnboardingCityRoute,
