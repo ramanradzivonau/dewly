@@ -14,6 +14,7 @@ import {
   type Plant,
 } from '@/features/plants/api'
 import {
+  FertilizerFields,
   PhotoNameFields,
   PlantSpotFields,
   PotSoilFields,
@@ -22,6 +23,7 @@ import {
 } from '@/features/plants/fields'
 import { plantSchema, type PlantFormValues } from '@/features/plants/options'
 import { usePickedPhoto } from '@/features/plants/usePickedPhoto'
+import { fertilizersQuery } from '@/features/fertilizers/api'
 import { roomsQuery } from '@/features/rooms/api'
 
 export const Route = createFileRoute('/_authed/plants/$plantId/edit')({
@@ -29,6 +31,7 @@ export const Route = createFileRoute('/_authed/plants/$plantId/edit')({
     const [plant] = await Promise.all([
       context.queryClient.ensureQueryData(plantQuery(params.plantId)),
       context.queryClient.ensureQueryData(roomsQuery()),
+      context.queryClient.ensureQueryData(fertilizersQuery()),
     ])
     if (!plant) throw notFound()
   },
@@ -47,6 +50,7 @@ function EditPlantForm({ plant }: { plant: Plant }) {
   const { user } = Route.useRouteContext()
   const navigate = useNavigate()
   const { data: rooms } = useSuspenseQuery(roomsQuery())
+  const { data: fertilizers } = useSuspenseQuery(fertilizersQuery())
   const update = useUpdatePlant(user.id, plant)
   const photo = usePickedPhoto()
   const form = useForm<PlantFormValues>({
@@ -91,6 +95,7 @@ function EditPlantForm({ plant }: { plant: Plant }) {
         <PotSoilFields />
         <PlantSpotFields />
         <ScheduleFields />
+        <FertilizerFields fertilizers={fertilizers} />
         <FormError message={update.error ? 'Couldn’t save the plant. Try again.' : null} />
         <DeletePlant plant={plant} />
       </FormScreen>

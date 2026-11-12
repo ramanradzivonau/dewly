@@ -1,5 +1,6 @@
 import { queryOptions, useMutation, useQueryClient } from '@tanstack/react-query'
 
+import type { FertilizerType } from '@/features/fertilizers/api'
 import { plantsKey } from '@/features/plants/api'
 import { supabase } from '@/lib/supabase'
 
@@ -7,7 +8,7 @@ import { tasksKey } from './keys'
 
 export { tasksKey }
 
-export type TaskType = 'water' | 'progress'
+export type TaskType = 'water' | 'fertilize' | 'progress'
 
 /** A row of the due_tasks view: one per plant and task type. */
 export type DueTask = {
@@ -25,13 +26,18 @@ export type DueTask = {
   overdue_days: number
   last_done_on: string | null
   done_today_event_id: string | null
+  /** Water rows: liquid fertilizer goes into this watering. */
+  with_fertilizer: boolean
+  fertilizer_name: string | null
+  fertilizer_type: FertilizerType | null
+  fert_dose: number | null
 }
 
 /** "Dry on top" is a normal watering; wet soil postpones instead. */
 export type SoilState = 'dry_top' | 'very_dry'
 
 const taskColumns =
-  'plant_id, type, nickname, cover_photo, room_id, room_name, tip, interval_days, due_on, today, overdue_days, last_done_on, done_today_event_id'
+  'plant_id, type, nickname, cover_photo, room_id, room_name, tip, interval_days, due_on, today, overdue_days, last_done_on, done_today_event_id, with_fertilizer, fertilizer_name, fertilizer_type, fert_dose'
 
 export const tasksQuery = () =>
   queryOptions({
@@ -62,11 +68,26 @@ function useCareMutation<T>(mutationFn: (input: T) => Promise<void>) {
   })
 }
 
+type WaterInput = { plantId: string; soil?: SoilState; withFertilizer?: boolean }
+
 export function useWater() {
-  return useCareMutation(async ({ plantId, soil }: { plantId: string; soil?: SoilState }) => {
+  return useCareMutation(async ({ plantId, soil, withFertilizer = false }: WaterInput) => {
+    const { error } = await supabase.from('care_events').insert({
+      plant_id: plantId,
+      type: 'water',
+      soil_state: soil ?? null,
+      with_fertilizer: withFertilizer,
+    })
+    if (error) throw error
+  })
+}
+
+/** Granules and sticks: their own Fertilize task. */
+export function useFertilize() {
+  return useCareMutation(async (plantId: string) => {
     const { error } = await supabase
       .from('care_events')
-      .insert({ plant_id: plantId, type: 'water', soil_state: soil ?? null })
+      .insert({ plant_id: plantId, type: 'fertilize' })
     if (error) throw error
   })
 }

@@ -188,6 +188,8 @@ function RangeRow({
             type="number"
             // Temperatures can go below zero; the numeric keypad has no minus key.
             inputMode={name === 'humidity' ? 'numeric' : undefined}
+            min={name === 'humidity' ? 0 : -10}
+            max={name === 'humidity' ? 100 : 45}
             aria-label={`${label} minimum`}
             aria-invalid={error?.min || error?.message ? true : undefined}
             aria-describedby={message ? errorId : undefined}
@@ -200,6 +202,8 @@ function RangeRow({
           <input
             type="number"
             inputMode={name === 'humidity' ? 'numeric' : undefined}
+            min={name === 'humidity' ? 0 : -10}
+            max={name === 'humidity' ? 100 : 45}
             aria-label={`${label} maximum`}
             aria-invalid={error?.max ? true : undefined}
             aria-describedby={message ? errorId : undefined}

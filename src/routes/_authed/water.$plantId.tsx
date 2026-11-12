@@ -8,6 +8,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   DropIcon,
+  FlaskIcon,
   DryIcon,
   WetIcon,
 } from '@/components/icons'
@@ -19,6 +20,7 @@ import {
   useWater,
   type SoilState,
 } from '@/features/care/api'
+import { formatDose } from '@/features/fertilizers/api'
 import { PlantPhoto } from '@/features/plants/PlantPhoto'
 
 export const Route = createFileRoute('/_authed/water/$plantId')({
@@ -97,16 +99,29 @@ function WaterTaskScreen() {
         </span>
       </Link>
 
-      <div className="flex gap-3 rounded-md border border-border bg-surface p-4">
-        <DropIcon width={22} height={22} className="mt-px shrink-0 text-primary-text" />
-        <div className="flex flex-col gap-0.5">
-          <span className="text-body font-bold text-ink">
-            {task.tip || 'Water when the top few cm are dry'}
-          </span>
-          <span className="text-field-label font-medium text-ink-subtle">
-            Pour until excess water drains from the bottom, then empty the saucer.
-          </span>
+      <div className="flex flex-col gap-3 rounded-md border border-border bg-surface p-4">
+        <div className="flex gap-3">
+          <DropIcon width={22} height={22} className="mt-px shrink-0 text-primary-text" />
+          <div className="flex flex-col gap-0.5">
+            <span className="text-body font-bold text-ink">
+              {task.tip || 'Water when the top few cm are dry'}
+            </span>
+            <span className="text-field-label font-medium text-ink-subtle">
+              Pour until excess water drains from the bottom, then empty the saucer.
+            </span>
+          </div>
         </div>
+        {task.with_fertilizer && task.fertilizer_type && task.fert_dose != null && (
+          <div className="flex gap-3 rounded-sm bg-fert-soft p-3">
+            <FlaskIcon width={22} height={22} className="mt-px shrink-0 text-fert" />
+            <div className="flex flex-col gap-0.5">
+              <span className="text-body font-bold text-fert">With fertilizer this time</span>
+              <span className="text-field-label font-medium text-fert">
+                {task.fertilizer_name} · {formatDose(task.fert_dose, task.fertilizer_type)}
+              </span>
+            </div>
+          </div>
+        )}
       </div>
 
       <section className="flex flex-col gap-3">
@@ -183,7 +198,12 @@ function WaterTaskScreen() {
             )}
             <Button
               loading={water.isPending}
-              onClick={() => water.mutate({ plantId, soil }, { onSuccess: backToToday })}
+              onClick={() =>
+                water.mutate(
+                  { plantId, soil, withFertilizer: task.with_fertilizer },
+                  { onSuccess: backToToday },
+                )
+              }
             >
               <CheckIcon width={20} height={20} />
               Mark as watered

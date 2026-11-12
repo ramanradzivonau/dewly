@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/Button'
 import { ChoiceGroup } from '@/components/ui/ChoiceGroup'
 import { useCreatePlant } from '@/features/plants/api'
 import {
+  FertilizerFields,
   PhotoNameFields,
   PlantSpotFields,
   PotSoilFields,
@@ -18,6 +19,7 @@ import {
 } from '@/features/plants/fields'
 import { plantDefaults, plantSchema, type PlantFormValues } from '@/features/plants/options'
 import { usePickedPhoto } from '@/features/plants/usePickedPhoto'
+import { fertilizersQuery } from '@/features/fertilizers/api'
 import { roomsQuery } from '@/features/rooms/api'
 
 const steps: { title: string; fields: FieldPath<PlantFormValues>[] }[] = [
@@ -55,7 +57,11 @@ export const Route = createFileRoute('/_authed/new-plant')({
     step: z.number().int().min(1).max(steps.length).catch(1).default(1),
     roomId: z.string().optional().catch(undefined),
   }),
-  loader: ({ context }) => context.queryClient.ensureQueryData(roomsQuery()),
+  loader: ({ context }) =>
+    Promise.all([
+      context.queryClient.ensureQueryData(roomsQuery()),
+      context.queryClient.ensureQueryData(fertilizersQuery()),
+    ]),
   component: NewPlantScreen,
 })
 
@@ -65,6 +71,7 @@ function NewPlantScreen() {
   const { user } = Route.useRouteContext()
   const navigate = useNavigate()
   const { data: rooms } = useSuspenseQuery(roomsQuery())
+  const { data: fertilizers } = useSuspenseQuery(fertilizersQuery())
   const create = useCreatePlant(user.id)
   const photo = usePickedPhoto()
   const [startedAt] = useState(step)
@@ -160,6 +167,7 @@ function NewPlantScreen() {
         {step === 4 && (
           <>
             <ScheduleFields />
+            <FertilizerFields fertilizers={fertilizers} />
             <FormCard>
               <h2 className="text-label text-primary">When did you last water it?</h2>
               <ChoiceGroup

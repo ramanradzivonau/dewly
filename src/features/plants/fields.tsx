@@ -1,11 +1,12 @@
 import { Link } from '@tanstack/react-router'
 import { useId, useRef, type ChangeEvent } from 'react'
-import { Controller, useFormContext, type FieldPath } from 'react-hook-form'
+import { Controller, useFormContext, useWatch, type FieldPath } from 'react-hook-form'
 
 import { FormCard } from '@/components/FormScreen'
 import { ChoiceGroup, Switch } from '@/components/ui/ChoiceGroup'
 import { NumberSlider } from '@/components/ui/NumberSlider'
 import { TextField } from '@/components/ui/TextField'
+import { doseUnits, type Fertilizer } from '@/features/fertilizers/api'
 import type { Room } from '@/features/rooms/api'
 import { lightLabels, windowLabel } from '@/features/rooms/options'
 
@@ -13,6 +14,8 @@ import {
   ageSpans,
   dateOf,
   drainageOptions,
+  fertModeOptions,
+  monthLabels,
   nearOptions,
   potTypeOptions,
   REPOT_UNKNOWN,
@@ -305,6 +308,8 @@ export function PlantSpotFields() {
                 id={hoursId}
                 type="number"
                 inputMode="numeric"
+                min={1}
+                max={24}
                 aria-invalid={formState.errors.grow_light_hours ? true : undefined}
                 className="min-h-11 w-18 rounded-sm bg-bg text-center text-input font-bold text-ink outline-none focus:ring-2 focus:ring-primary aria-invalid:ring-2 aria-invalid:ring-danger"
                 {...register('grow_light_hours', { valueAsNumber: true })}
@@ -376,6 +381,8 @@ function DaysRow({
             id={id}
             type="number"
             inputMode="numeric"
+            min={name === 'progress_days' ? 7 : 1}
+            max={name === 'progress_days' ? 180 : 90}
             aria-invalid={error ? true : undefined}
             className="min-h-11 w-16 rounded-sm bg-bg text-center text-input font-bold text-ink outline-none focus:ring-2 focus:ring-primary aria-invalid:ring-2 aria-invalid:ring-danger"
             {...register(name, { valueAsNumber: true })}
@@ -416,5 +423,149 @@ function SpanField({
         />
       )}
     />
+  )
+}
+
+/** Feeding plan: which fertilizer, how often, in which months, and the dose. */
+export function FertilizerFields({ fertilizers }: { fertilizers: Fertilizer[] }) {
+  const {
+    control,
+    register,
+    formState: { errors },
+  } = useFormContext<PlantFormValues>()
+  const [fertilizerId, mode] = useWatch({ control, name: ['fertilizer_id', 'fert_mode'] })
+  const fertilizer = fertilizers.find((f) => f.id === fertilizerId)
+  const nId = useId()
+  const doseId = useId()
+  const input =
+    'min-h-11 w-16 rounded-sm bg-bg text-center text-input font-bold text-ink outline-none focus:ring-2 focus:ring-primary aria-invalid:ring-2 aria-invalid:ring-danger'
+
+  return (
+    <FormCard>
+      <Title>Fertilizer</Title>
+      {fertilizers.length === 0 ? (
+        <p className="text-caption font-medium text-ink-subtle">
+          Add your fertilizers in Profile, then pick one here.
+        </p>
+      ) : (
+        <Controller
+          control={control}
+          name="fertilizer_id"
+          render={({ field }) => (
+            <ChoiceGroup
+              label="Fertilizer"
+              options={[
+                ...fertilizers.map((f) => ({ value: f.id, label: f.name })),
+                { value: '', label: 'None' },
+              ]}
+              value={field.value}
+              onChange={field.onChange}
+            />
+          )}
+        />
+      )}
+
+      {fertilizer && (
+        <>
+          <Controller
+            control={control}
+            name="fert_mode"
+            render={({ field }) => (
+              <ChoiceGroup
+                label="How often"
+                options={fertModeOptions}
+                value={field.value}
+                onChange={field.onChange}
+              />
+            )}
+          />
+          <div className="flex items-center justify-between gap-3">
+            <label htmlFor={nId} className="text-body font-semibold text-ink">
+              {mode === 'every_n_waterings' ? 'Every Nth watering, N =' : 'Every N weeks, N ='}
+            </label>
+            <input
+              id={nId}
+              type="number"
+              inputMode="numeric"
+              min={1}
+              max={12}
+              aria-invalid={errors.fert_n ? true : undefined}
+              className={input}
+              {...register('fert_n', { valueAsNumber: true })}
+            />
+          </div>
+          {errors.fert_n && (
+            <p className="text-right text-caption text-danger">{errors.fert_n.message}</p>
+          )}
+
+          <h3 className="mt-1 text-field-label font-extrabold text-ink">Active months</h3>
+          <Controller
+            control={control}
+            name="fert_months"
+            render={({ field }) => (
+              <div role="group" aria-label="Active months" className="grid grid-cols-6 gap-1.5">
+                {monthLabels.map((label, i) => {
+                  const month = i + 1
+                  const on = field.value.includes(month)
+                  return (
+                    <button
+                      key={label}
+                      type="button"
+                      aria-pressed={on}
+                      onClick={() =>
+                        field.onChange(
+                          on ? field.value.filter((m) => m !== month) : [...field.value, month],
+                        )
+                      }
+                      className={`min-h-11 rounded-sm border-2 text-caption ${
+                        on
+                          ? 'border-primary bg-primary-soft text-ink'
+                          : 'border-border text-ink-muted'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  )
+                })}
+              </div>
+            )}
+          />
+          {errors.fert_months && (
+            <p className="text-caption text-danger">{errors.fert_months.message}</p>
+          )}
+
+          <div className="flex flex-col gap-1">
+            <label htmlFor={doseId} className="text-body font-semibold text-ink">
+              Dose
+            </label>
+            <div className="flex items-center gap-2.5">
+              <input
+                id={doseId}
+                type="number"
+                inputMode="numeric"
+                step={1}
+                min={1}
+                max={1000}
+                placeholder={String(fertilizer.dose)}
+                aria-invalid={errors.fert_dose ? true : undefined}
+                className={`${input} w-20 placeholder:text-ink-subtle`}
+                {...register('fert_dose', {
+                  setValueAs: (v: string) => (v === '' || v == null ? null : Number(v)),
+                })}
+              />
+              <span className="text-field-label font-medium text-ink-subtle">
+                {doseUnits[fertilizer.type]}
+              </span>
+            </div>
+            <p className="text-caption font-medium text-ink-subtle">
+              Empty uses the fertilizer’s own dose.
+            </p>
+            {errors.fert_dose && (
+              <p className="text-caption text-danger">{errors.fert_dose.message}</p>
+            )}
+          </div>
+        </>
+      )}
+    </FormCard>
   )
 }

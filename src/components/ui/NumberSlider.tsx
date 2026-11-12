@@ -25,6 +25,8 @@ export function NumberSlider({ label, unit, value, onChange, min, max, error }: 
           id={id}
           type="number"
           inputMode="numeric"
+          min={1}
+          max={max}
           value={value ?? ''}
           placeholder="—"
           onChange={(e) => onChange(e.target.value === '' ? null : Number(e.target.value))}

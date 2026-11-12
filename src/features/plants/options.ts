@@ -95,6 +95,38 @@ const int = (min: number, max: number, message: string) =>
 
 const optionalInt = (min: number, max: number, message: string) => int(min, max, message).nullable()
 
+export const fertModes = ['every_n_waterings', 'every_n_weeks'] as const
+export type FertMode = (typeof fertModes)[number]
+export const fertModeOptions: Choice<FertMode>[] = [
+  { value: 'every_n_waterings', label: 'Every Nth watering' },
+  { value: 'every_n_weeks', label: 'Every N weeks' },
+]
+
+export const monthLabels = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+]
+
+/** "March – September", or a list when the months aren't one run. */
+export const monthsLabel = (months: number[]) => {
+  const sorted = [...months].sort((a, b) => a - b)
+  if (sorted.length === 12) return 'All year'
+  const run = sorted.every((m, i) => i === 0 || m === sorted[i - 1]! + 1)
+  return run && sorted.length > 2
+    ? `${monthLabels[sorted[0]! - 1]} – ${monthLabels[sorted.at(-1)! - 1]}`
+    : sorted.map((m) => monthLabels[m - 1]).join(', ')
+}
+
 export const plantSchema = z
   .object({
     nickname: z
@@ -118,6 +150,21 @@ export const plantSchema = z
     water_days_cold: int(1, 90, 'Between 1 and 90 days'),
     progress_days: int(7, 180, 'Between 7 and 180 days'),
     tip: z.string().trim().max(200, 'Keep it under 200 characters'),
+    // Feeding plan; an empty fertilizer_id means none.
+    fertilizer_id: z.string(),
+    fert_mode: z.enum(fertModes),
+    fert_n: int(1, 12, 'Between 1 and 12'),
+    fert_months: z.array(z.number().int().min(1).max(12)),
+    fert_dose: z
+      .number()
+      .int('Whole numbers only')
+      .positive('Enter a dose or leave it empty')
+      .max(1000, 'Up to 1000')
+      .nullable(),
+  })
+  .refine((v) => !v.fertilizer_id || v.fert_months.length > 0, {
+    error: 'Pick at least one month',
+    path: ['fert_months'],
   })
   .refine((v) => v.soil !== 'custom' || v.soil_custom.length > 0, {
     error: 'Describe the soil',
@@ -144,4 +191,9 @@ export const plantDefaults: PlantFormValues = {
   water_days_cold: 10,
   progress_days: 30,
   tip: '',
+  fertilizer_id: '',
+  fert_mode: 'every_n_waterings',
+  fert_n: 2,
+  fert_months: [3, 4, 5, 6, 7, 8, 9],
+  fert_dose: null,
 }
