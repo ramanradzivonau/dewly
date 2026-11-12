@@ -21,3 +21,8 @@
     display: none;
   }
 }
+
+/* Top of every screen: 20px, or the iPhone's safe area when that's taller. */
+@utility pt-screen {
+  padding-top: max(var(--spacing-5), env(safe-area-inset-top));
+}

@@ -54,7 +54,7 @@ function PlantScreen() {
     'flex size-11 items-center justify-center rounded-pill border border-border bg-surface text-primary'
 
   return (
-    <main className="mx-auto flex max-w-md flex-col gap-4.5 px-4 pt-[max(var(--spacing-7),env(safe-area-inset-top))] pb-10">
+    <main className="mx-auto flex max-w-md flex-col gap-4.5 px-4 pt-screen pb-10">
       <nav className="flex items-center justify-between">
         <Link
           to="/rooms/$roomId"
@@ -95,6 +95,13 @@ function PlantScreen() {
 
       <Schedule plant={plant} />
       <BasedOn plant={plant} />
+      <Link
+        to="/plants/$plantId/history"
+        params={{ plantId }}
+        className="flex min-h-12 w-full items-center justify-center rounded-pill bg-track text-label font-bold text-primary"
+      >
+        Care history
+      </Link>
     </main>
   )
 }
@@ -226,7 +233,7 @@ function BasedOn({ plant }: { plant: Plant }) {
 
 function PlantNotFound() {
   return (
-    <main className="mx-auto flex max-w-md flex-col gap-4 px-5 pt-[max(var(--spacing-7),env(safe-area-inset-top))]">
+    <main className="mx-auto flex max-w-md flex-col gap-4 px-5 pt-screen">
       <h1 className="text-title text-ink">Plant not found</h1>
       <p className="text-body text-ink-muted">It may have been deleted.</p>
       <Link to="/plants" className="text-label text-primary-text">

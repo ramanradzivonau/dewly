@@ -92,7 +92,6 @@
   --spacing-3: 12px; /* Between rows inside a card. */
   --spacing-4: 16px; /* Screen side padding, gap between cards. */
   --spacing-5: 20px; /* Card padding. */
-  --spacing-7: 56px; /* Top safe area on every screen. */
 
   /* Radius */
   --radius-sm: 12px; /* Inputs inside cards, small icon tiles. */

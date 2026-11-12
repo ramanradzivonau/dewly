@@ -61,7 +61,7 @@ function WaterTaskScreen() {
   const notDue = task.due_on > task.today && !task.done_today_event_id
 
   return (
-    <main className="mx-auto flex min-h-dvh max-w-md flex-col gap-5 px-5 pt-[max(var(--spacing-7),env(safe-area-inset-top))] pb-[max(32px,env(safe-area-inset-bottom))]">
+    <main className="mx-auto flex min-h-dvh max-w-md flex-col gap-5 px-5 pt-screen pb-[max(32px,env(safe-area-inset-bottom))]">
       <Link
         to="/today"
         className="-ml-1 flex min-h-11 items-center gap-1 self-start text-label font-semibold text-primary-text"

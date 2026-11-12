@@ -2,7 +2,6 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { z } from 'zod'
 
-import { DewlyLogo } from '@/components/DewlyLogo'
 import { CalendarIcon, CheckIcon, ListIcon } from '@/components/icons'
 import {
   isToday,
@@ -61,11 +60,8 @@ function TodayScreen() {
           : `${plantsWord(open.length)} ${open.length === 1 ? 'needs' : 'need'} fertilizer today.`
 
   return (
-    <main className="mx-auto flex max-w-md flex-col gap-5.5 px-4 pt-[max(var(--spacing-7),env(safe-area-inset-top))] pb-40">
+    <main className="mx-auto flex max-w-md flex-col gap-5.5 px-4 pt-screen pb-40">
       <header className="flex flex-col gap-1.5 px-1">
-        <div className="mb-3.5">
-          <DewlyLogo size="sm" />
-        </div>
         <h1 className="text-display text-primary">{greeting()}</h1>
         <p className="text-body text-ink-muted">{summary}</p>
       </header>
