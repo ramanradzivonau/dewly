@@ -3,6 +3,7 @@ import { queryOptions, useMutation, useQueryClient } from '@tanstack/react-query
 import { tasksKey } from '@/features/care/keys'
 import type { FertilizerType } from '@/features/fertilizers/api'
 import { roomColumns, roomsKey, type Room } from '@/features/rooms/api'
+import { saveSpecies, type SpeciesPick } from '@/features/species/api'
 import { supabase } from '@/lib/supabase'
 
 import {
@@ -34,6 +35,7 @@ export type CareSchedule = {
 export type Plant = {
   id: string
   room_id: string
+  species_id: string | null
   nickname: string
   cover_photo: string | null
   pot_type: PotType
@@ -47,10 +49,11 @@ export type Plant = {
   grow_light_hours: number | null
   room: Room
   schedule: CareSchedule | null
+  species: { scientific_name: string; common_name: string | null } | null
 }
 
 const plantColumns =
-  'id, room_id, nickname, cover_photo, pot_type, pot_diameter_cm, drainage, soil, repotted_on, height_cm, born_on, near, grow_light_hours'
+  'id, room_id, species_id, nickname, cover_photo, pot_type, pot_diameter_cm, drainage, soil, repotted_on, height_cm, born_on, near, grow_light_hours'
 const scheduleColumns =
   'water_days_warm, water_days_cold, tip, progress_days, source, explanation, fertilizer_id, fert_mode, fert_n, fert_months, fert_dose, fertilizer:fertilizers (id, name, type, dose)'
 
@@ -65,7 +68,7 @@ export const plantQuery = (id: string) =>
       const { data, error } = await supabase
         .from('plants')
         .select(
-          `${plantColumns}, room:rooms (${roomColumns}), schedule:care_schedules (${scheduleColumns})`,
+          `${plantColumns}, room:rooms (${roomColumns}), schedule:care_schedules (${scheduleColumns}), species (scientific_name, common_name)`,
         )
         .eq('id', id)
         .maybeSingle()
@@ -132,16 +135,24 @@ export const toFormValues = (p: Plant): PlantFormValues => ({
 type SaveInput = { values: PlantFormValues; photo: Blob | null }
 
 /** How long ago the plant was last watered, when known; logged so the first task lands right. */
-type CreateInput = SaveInput & { lastWateredDaysAgo: number | null }
+/** `species`: a newly picked one, or null to keep the current. */
+type UpdateInput = SaveInput & { species: SpeciesPick | null }
+
+type CreateInput = SaveInput & {
+  lastWateredDaysAgo: number | null
+  /** Picked in the first step; saved before the plant. */
+  species: SpeciesPick | null
+}
 
 export function useCreatePlant(userId: string) {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async ({ values, photo, lastWateredDaysAgo }: CreateInput) => {
+    mutationFn: async ({ values, photo, lastWateredDaysAgo, species }: CreateInput) => {
+      const species_id = species ? await saveSpecies(species) : null
       const cover_photo = photo ? await uploadPhoto(userId, photo) : null
       const { data, error } = await supabase
         .from('plants')
-        .insert({ ...toPlantRow(values), cover_photo })
+        .insert({ ...toPlantRow(values), cover_photo, species_id })
         .select('id')
         .single()
       if (error) {
@@ -175,11 +186,12 @@ export function useCreatePlant(userId: string) {
 export function useUpdatePlant(userId: string, plant: Plant) {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async ({ values, photo }: SaveInput) => {
+    mutationFn: async ({ values, photo, species }: UpdateInput) => {
+      const species_id = species ? await saveSpecies(species) : plant.species_id
       const cover_photo = photo ? await uploadPhoto(userId, photo) : plant.cover_photo
       const { error } = await supabase
         .from('plants')
-        .update({ ...toPlantRow(values), cover_photo })
+        .update({ ...toPlantRow(values), cover_photo, species_id })
         .eq('id', plant.id)
       if (error) {
         if (photo && cover_photo) await removePhotos([cover_photo])

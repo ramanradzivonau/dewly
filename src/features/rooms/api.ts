@@ -19,13 +19,18 @@ export type Room = {
 }
 
 /** The few plant fields the room screens show. */
-export type RoomPlant = { id: string; nickname: string; cover_photo: string | null }
+export type RoomPlant = {
+  id: string
+  nickname: string
+  cover_photo: string | null
+  species: { scientific_name: string } | null
+}
 
 export type RoomWithPlants = Room & { plants: RoomPlant[] }
 
 export const roomColumns =
   'id, name, light, window_dir, winter_min, winter_max, summer_min, summer_max, humidity_min, humidity_max, drafts'
-const withPlants = `${roomColumns}, plants (id, nickname, cover_photo)`
+const withPlants = `${roomColumns}, plants (id, nickname, cover_photo, species (scientific_name))`
 
 export const roomsKey = ['rooms'] as const
 
@@ -39,7 +44,8 @@ export const roomsQuery = () =>
         .order('created_at')
         .order('created_at', { referencedTable: 'plants' })
       if (error) throw error
-      return data as RoomWithPlants[]
+      // Many-to-one embeds (plant → species) come back as objects, not the lists the types guess.
+      return data as unknown as RoomWithPlants[]
     },
   })
 
@@ -54,7 +60,7 @@ export const roomQuery = (id: string) =>
         .order('created_at', { referencedTable: 'plants' })
         .maybeSingle()
       if (error) throw error
-      return data as RoomWithPlants | null
+      return data as unknown as RoomWithPlants | null
     },
   })
 
