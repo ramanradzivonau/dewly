@@ -3,7 +3,7 @@ import { SparkleIcon } from '@/components/icons'
 import type { Recommendation } from './api'
 
 type SuggestionCardProps = {
-  state: 'idle' | 'loading' | 'error' | 'ready'
+  state: 'idle' | 'loading' | 'retrying' | 'error' | 'ready'
   suggestion: Recommendation | null
   onRetry: () => void
 }
@@ -12,14 +12,14 @@ type SuggestionCardProps = {
 export function SuggestionCard({ state, suggestion, onRetry }: SuggestionCardProps) {
   if (state === 'idle') return null
 
-  if (state === 'loading') {
+  if (state === 'loading' || state === 'retrying') {
     return (
       <p
         aria-live="polite"
         className="flex items-center gap-2.5 rounded-md bg-track px-4 py-3.5 text-field-label text-primary"
       >
         <SparkleIcon width={20} height={20} className="shrink-0 animate-pulse" />
-        Working out a care schedule…
+        {state === 'retrying' ? 'Gemini is busy, trying again…' : 'Working out a care schedule…'}
       </p>
     )
   }
