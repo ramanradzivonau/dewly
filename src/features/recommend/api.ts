@@ -45,8 +45,8 @@ export type Recommendation = z.infer<typeof responseSchema>['recommendation']
 async function recommend(body: Record<string, unknown>) {
   const { data, error } = await supabase.functions.invoke('recommend', {
     body,
-    // The function gives up on Gemini after 45 s; don't spin forever if the network hangs.
-    signal: AbortSignal.timeout(60_000),
+    // The function gives up on Gemini after ~90 s; don't spin forever if the network hangs.
+    signal: AbortSignal.timeout(100_000),
   })
   if (error) throw error
   return responseSchema.parse(data)
@@ -92,3 +92,26 @@ export function useRecommend(plantId: string) {
 /** Saves the AI schedule for a just-created plant; the answer comes from the cache. */
 export const applyRecommendation = (plantId: string) =>
   recommend({ plant_id: plantId, force: true })
+
+/**
+ * Recalculates AI schedules one by one, in the background. Custom schedules are skipped by
+ * the function itself. Failures are left for the next trigger (edit, new month, button).
+ */
+export async function recalculate(plantIds: string[]) {
+  for (const id of plantIds) {
+    await recommend({ plant_id: id, force: false }).catch(() => undefined)
+  }
+}
+
+/** AI schedules of these plants (or all), optionally only those computed before `before`. */
+export async function aiSchedules({ roomId, before }: { roomId?: string; before?: Date } = {}) {
+  let query = supabase
+    .from('care_schedules')
+    .select('plant_id, computed_at, plant:plants!inner (room_id)')
+    .eq('source', 'ai')
+  if (roomId) query = query.eq('plant.room_id', roomId)
+  if (before) query = query.or(`computed_at.is.null,computed_at.lt.${before.toISOString()}`)
+  const { data, error } = await query
+  if (error) throw error
+  return data.map((s) => s.plant_id as string)
+}

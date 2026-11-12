@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
@@ -8,6 +8,7 @@ import { FormCard, FormError, FormScreen } from '@/components/FormScreen'
 import { Button } from '@/components/ui/Button'
 import {
   plantQuery,
+  plantsKey,
   toFormValues,
   useDeletePlant,
   useUpdatePlant,
@@ -23,6 +24,8 @@ import {
 } from '@/features/plants/fields'
 import { plantSchema, type PlantFormValues } from '@/features/plants/options'
 import { usePickedPhoto } from '@/features/plants/usePickedPhoto'
+import { recalculate } from '@/features/recommend/api'
+import { tasksKey } from '@/features/care/keys'
 import type { SpeciesPick } from '@/features/species/api'
 import { SpeciesField } from '@/features/species/SpeciesField'
 import { fertilizersQuery } from '@/features/fertilizers/api'
@@ -49,6 +52,7 @@ function EditPlantScreen() {
 
 /** Every plant setting on one page, grouped like the Add plant steps. */
 function EditPlantForm({ plant }: { plant: Plant }) {
+  const queryClient = useQueryClient()
   const { user } = Route.useRouteContext()
   const navigate = useNavigate()
   const { data: rooms } = useSuspenseQuery(roomsQuery())
@@ -65,8 +69,16 @@ function EditPlantForm({ plant }: { plant: Plant }) {
     update.mutate(
       { values, photo: photo.blob, species },
       {
-        onSuccess: () =>
-          navigate({ to: '/plants/$plantId', params: { plantId: plant.id }, replace: true }),
+        onSuccess: () => {
+          // New pot, spot or room changes the care; the function skips custom schedules.
+          void recalculate([plant.id]).then(() =>
+            Promise.all([
+              queryClient.invalidateQueries({ queryKey: [...plantsKey, plant.id] }),
+              queryClient.invalidateQueries({ queryKey: tasksKey }),
+            ]),
+          )
+          return navigate({ to: '/plants/$plantId', params: { plantId: plant.id }, replace: true })
+        },
       },
     ),
   )
