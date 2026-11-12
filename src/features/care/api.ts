@@ -112,3 +112,28 @@ export function useUndo() {
 /** "Overdue by 2 days", "2d late". */
 export const overdueLabel = (days: number) => `Overdue by ${days === 1 ? '1 day' : `${days} days`}`
 export const lateBadge = (days: number) => `${days}d late`
+
+export type CareEvent = {
+  id: string
+  type: 'water' | 'fertilize' | 'postpone' | 'progress'
+  at: string
+  soil_state: SoilState | null
+  with_fertilizer: boolean
+  postpone_days: number | null
+}
+
+/** A plant's care log, newest first. */
+export const careEventsQuery = (plantId: string) =>
+  queryOptions({
+    queryKey: [...tasksKey, 'events', plantId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('care_events')
+        .select('id, type, at, soil_state, with_fertilizer, postpone_days')
+        .eq('plant_id', plantId)
+        .order('at', { ascending: false })
+        .limit(500)
+      if (error) throw error
+      return data as CareEvent[]
+    },
+  })

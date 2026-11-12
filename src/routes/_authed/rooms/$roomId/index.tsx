@@ -32,7 +32,7 @@ function RoomScreen() {
   ]
 
   return (
-    <main className="mx-auto flex max-w-md flex-col gap-5 px-5 pt-[max(var(--spacing-7),env(safe-area-inset-top))] pb-10">
+    <main className="mx-auto flex max-w-md flex-col gap-5 px-5 pt-screen pb-10">
       <nav className="flex items-center justify-between">
         <Link
           to="/plants"
@@ -104,7 +104,7 @@ function RoomScreen() {
 
 function RoomNotFound() {
   return (
-    <main className="mx-auto flex max-w-md flex-col gap-4 px-5 pt-[max(var(--spacing-7),env(safe-area-inset-top))]">
+    <main className="mx-auto flex max-w-md flex-col gap-4 px-5 pt-screen">
       <h1 className="text-title text-ink">Room not found</h1>
       <p className="text-body text-ink-muted">It may have been deleted.</p>
       <Link to="/plants" className="text-label text-primary-text">

@@ -40,7 +40,7 @@ export function FormScreen({
     <form
       noValidate
       onSubmit={onSubmit}
-      className={`mx-auto flex min-h-dvh max-w-md flex-col gap-4.5 px-5 pt-[max(var(--spacing-7),env(safe-area-inset-top))] ${bottomBar ? 'pb-36' : 'pb-10'}`}
+      className={`mx-auto flex min-h-dvh max-w-md flex-col gap-4.5 px-5 pt-screen ${bottomBar ? 'pb-36' : 'pb-10'}`}
     >
       {back && (
         <Link
