@@ -1,12 +1,15 @@
 import { queryOptions, useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { tasksKey } from '@/features/care/keys'
+import type { FertilizerType } from '@/features/fertilizers/api'
 import { roomColumns, roomsKey, type Room } from '@/features/rooms/api'
 import { supabase } from '@/lib/supabase'
 
 import {
   isSoilPreset,
+  plantDefaults,
   type Drainage,
+  type FertMode,
   type Near,
   type PlantFormValues,
   type PotType,
@@ -20,6 +23,12 @@ export type CareSchedule = {
   progress_days: number
   source: 'ai' | 'custom'
   explanation: string | null
+  fertilizer_id: string | null
+  fert_mode: FertMode | null
+  fert_n: number | null
+  fert_months: number[]
+  fert_dose: number | null
+  fertilizer: { id: string; name: string; type: FertilizerType; dose: number } | null
 }
 
 export type Plant = {
@@ -42,7 +51,8 @@ export type Plant = {
 
 const plantColumns =
   'id, room_id, nickname, cover_photo, pot_type, pot_diameter_cm, drainage, soil, repotted_on, height_cm, born_on, near, grow_light_hours'
-const scheduleColumns = 'water_days_warm, water_days_cold, tip, progress_days, source, explanation'
+const scheduleColumns =
+  'water_days_warm, water_days_cold, tip, progress_days, source, explanation, fertilizer_id, fert_mode, fert_n, fert_months, fert_dose, fertilizer:fertilizers (id, name, type, dose)'
 
 export const plantsKey = ['plants'] as const
 
@@ -87,6 +97,11 @@ const toScheduleRow = (v: PlantFormValues) => ({
   water_days_cold: v.water_days_cold,
   progress_days: v.progress_days,
   tip: v.tip || null,
+  fertilizer_id: v.fertilizer_id || null,
+  fert_mode: v.fertilizer_id ? v.fert_mode : null,
+  fert_n: v.fertilizer_id ? v.fert_n : null,
+  fert_months: v.fert_months,
+  fert_dose: v.fertilizer_id ? v.fert_dose : null,
 })
 
 export const toFormValues = (p: Plant): PlantFormValues => ({
@@ -107,6 +122,11 @@ export const toFormValues = (p: Plant): PlantFormValues => ({
   water_days_cold: p.schedule?.water_days_cold ?? 10,
   progress_days: p.schedule?.progress_days ?? 30,
   tip: p.schedule?.tip ?? '',
+  fertilizer_id: p.schedule?.fertilizer_id ?? '',
+  fert_mode: p.schedule?.fert_mode ?? plantDefaults.fert_mode,
+  fert_n: p.schedule?.fert_n ?? plantDefaults.fert_n,
+  fert_months: p.schedule?.fert_months ?? plantDefaults.fert_months,
+  fert_dose: p.schedule?.fert_dose ?? null,
 })
 
 type SaveInput = { values: PlantFormValues; photo: Blob | null }

@@ -2,11 +2,21 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Link, notFound } from '@tanstack/react-router'
 import type { ReactNode } from 'react'
 
-import { CameraIcon, ChevronLeftIcon, DropIcon, HomeIcon, PencilIcon } from '@/components/icons'
+import {
+  CameraIcon,
+  ChevronLeftIcon,
+  DropIcon,
+  FlaskIcon,
+  HomeIcon,
+  PencilIcon,
+} from '@/components/icons'
+import { formatDose } from '@/features/fertilizers/api'
 import { plantQuery, type Plant } from '@/features/plants/api'
 import {
   ageLabel,
   drainageOptions,
+  monthsLabel,
+  type FertMode,
   nearOptions,
   potTypeOptions,
   REPOT_UNKNOWN,
@@ -25,6 +35,11 @@ export const Route = createFileRoute('/_authed/plants/$plantId/')({
 })
 
 const days = (n: number) => (n === 1 ? 'day' : `${n} days`)
+const ordinal = (n: number) => (n === 1 ? '' : `${n}${n === 2 ? 'nd' : n === 3 ? 'rd' : 'th'} `)
+const fertEvery = (mode: FertMode, n: number) =>
+  mode === 'every_n_waterings'
+    ? `every ${ordinal(n)}watering`
+    : `every ${n === 1 ? 'week' : `${n} weeks`}`
 const label = <T extends string>(options: { value: T; label: string }[], value: T) =>
   options.find((o) => o.value === value)?.label ?? value
 const monthYear = (date: string) =>
@@ -97,6 +112,14 @@ function Schedule({ plant }: { plant: Plant }) {
             title={`Water every ${days(s.water_days_warm)}`}
             sub={[`Every ${days(s.water_days_cold)} in winter`, s.tip].filter(Boolean).join(' · ')}
           />
+          {s.fertilizer && s.fert_mode && s.fert_n && (
+            <Row
+              icon={<FlaskIcon />}
+              tone="bg-fert-soft text-fert"
+              title={`${s.fertilizer.name}: ${fertEvery(s.fert_mode, s.fert_n)}`}
+              sub={`${monthsLabel(s.fert_months)} · ${formatDose(s.fert_dose ?? s.fertilizer.dose, s.fertilizer.type)}`}
+            />
+          )}
           <Row
             icon={<CameraIcon />}
             tone="bg-primary-soft text-primary"
