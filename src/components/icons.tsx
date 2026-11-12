@@ -183,3 +183,12 @@ export function ClockIcon(props: IconProps) {
     </svg>
   )
 }
+
+/** AI suggestions. */
+export function SparkleIcon(props: IconProps) {
+  return (
+    <svg {...base} strokeWidth={2} {...props}>
+      <path d="M12 3l1.8 4.7L18 9l-4.2 1.3L12 15l-1.8-4.7L6 9l4.2-1.3zM18 15l.8 2.2L21 18l-2.2.8L18 21l-.8-2.2L15 18l2.2-.8z" />
+    </svg>
+  )
+}

@@ -9,6 +9,7 @@ import {
   FlaskIcon,
   HomeIcon,
   PencilIcon,
+  SparkleIcon,
 } from '@/components/icons'
 import { formatDose } from '@/features/fertilizers/api'
 import { plantQuery, type Plant } from '@/features/plants/api'
@@ -23,6 +24,7 @@ import {
   soilLabel,
 } from '@/features/plants/options'
 import { PlantPhoto } from '@/features/plants/PlantPhoto'
+import { careInfoSchema, useRecommend } from '@/features/recommend/api'
 import { lightLabels, windowLabel } from '@/features/rooms/options'
 
 export const Route = createFileRoute('/_authed/plants/$plantId/')({
@@ -120,6 +122,7 @@ function PlantScreen() {
       </div>
 
       <Schedule plant={plant} />
+      <CareInfo plant={plant} />
       <BasedOn plant={plant} />
     </main>
   )
@@ -129,7 +132,18 @@ function Schedule({ plant }: { plant: Plant }) {
   const s = plant.schedule
   return (
     <section className="flex flex-col rounded-lg bg-surface px-5 pt-5 pb-2">
-      <h2 className="mb-1 text-section text-primary">Schedule</h2>
+      <div className="mb-1 flex items-center justify-between gap-3">
+        <h2 className="text-section text-primary">Schedule</h2>
+        {s && (
+          <span
+            className={`rounded-sm px-2.5 py-1 text-caption font-extrabold ${
+              s.source === 'ai' ? 'bg-primary-soft text-primary' : 'bg-track text-ink-muted'
+            }`}
+          >
+            {s.source === 'ai' ? 'AI recommendation' : 'Custom'}
+          </span>
+        )}
+      </div>
       {s ? (
         <>
           <Row
@@ -155,6 +169,91 @@ function Schedule({ plant }: { plant: Plant }) {
       ) : (
         <p className="pb-3 text-body text-ink-subtle">No schedule yet. Set one in Edit.</p>
       )}
+      <AiActions plant={plant} />
+    </section>
+  )
+}
+
+/** Why the AI chose these numbers, and the button to ask again. A custom schedule offers to go back. */
+function AiActions({ plant }: { plant: Plant }) {
+  const recommend = useRecommend(plant.id)
+  const custom = plant.schedule?.source !== 'ai'
+  const explanation = plant.schedule?.source === 'ai' ? plant.schedule.explanation : null
+
+  return (
+    <div className="flex flex-col gap-2.5 border-t border-divider pt-3.5 pb-3">
+      {explanation && (
+        <p className="flex gap-2 text-field-label font-medium text-ink-muted">
+          <SparkleIcon width={18} height={18} className="mt-0.5 shrink-0 text-primary" />
+          {explanation}
+        </p>
+      )}
+      {custom && (
+        <p className="text-caption font-medium text-ink-subtle">
+          You set this schedule by hand, so recalculation leaves it alone.
+        </p>
+      )}
+      {recommend.isError && (
+        <p role="alert" className="text-caption text-danger">
+          Couldn’t get a recommendation. Try again later.
+        </p>
+      )}
+      <button
+        type="button"
+        disabled={recommend.isPending}
+        onClick={() => recommend.mutate(custom)}
+        className="flex min-h-12 items-center justify-center gap-2 rounded-pill border-[1.5px] border-primary text-body font-bold text-primary disabled:opacity-60"
+      >
+        <SparkleIcon width={18} height={18} />
+        {recommend.isPending ? 'Asking…' : custom ? 'Use AI recommendation' : 'Recalculate'}
+      </button>
+    </div>
+  )
+}
+
+const toxicityText = { toxic: 'Toxic', non_toxic: 'Safe', unknown: 'Unknown' } as const
+const growthText = { slow: 'Slow', medium: 'Medium', fast: 'Fast' } as const
+
+/** Species care info and pet toxicity from Gemini, marked as AI-generated. */
+function CareInfo({ plant }: { plant: Plant }) {
+  const parsed = careInfoSchema.safeParse(plant.species?.care_info)
+  if (!parsed.success) return null
+  const info = parsed.data
+  const toxic = info.toxicity.cats === 'toxic' || info.toxicity.dogs === 'toxic'
+  const rows: [string, string][] = [
+    ['Light', info.light],
+    ['Watering', info.watering],
+    ['Soil', info.soil],
+    ['Humidity', info.humidity],
+    ['Temperature', info.temperature],
+    [
+      'Growth',
+      `${growthText[info.growth_rate]} · pot ${info.pot_diameter_cm.min}–${info.pot_diameter_cm.max} cm`,
+    ],
+  ]
+
+  return (
+    <section className="flex flex-col gap-3 rounded-lg bg-surface p-5">
+      <h2 className="text-section text-primary">Care info</h2>
+      <p
+        className={`flex flex-col gap-0.5 rounded-md px-4 py-3 text-field-label ${
+          toxic ? 'bg-danger-soft text-danger-strong' : 'bg-primary-soft text-primary'
+        }`}
+      >
+        <span className="font-extrabold">
+          Cats: {toxicityText[info.toxicity.cats]} · Dogs: {toxicityText[info.toxicity.dogs]}
+        </span>
+        {info.toxicity.note && <span className="font-medium">{info.toxicity.note}</span>}
+      </p>
+      <dl className="flex flex-col gap-2.5">
+        {rows.map(([name, value]) => (
+          <div key={name} className="flex flex-col gap-0.5">
+            <dt className="text-caption font-extrabold text-ink">{name}</dt>
+            <dd className="text-field-label font-medium text-ink-muted">{value}</dd>
+          </div>
+        ))}
+      </dl>
+      <p className="text-nav font-medium text-ink-subtle">AI-generated, verify if unsure.</p>
     </section>
   )
 }

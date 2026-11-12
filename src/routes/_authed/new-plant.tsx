@@ -23,6 +23,12 @@ import { fertilizersQuery } from '@/features/fertilizers/api'
 import { roomsQuery } from '@/features/rooms/api'
 import type { SpeciesPick } from '@/features/species/api'
 import { IdentifyStep } from '@/features/species/IdentifyStep'
+import {
+  applyRecommendation,
+  useDraftRecommendation,
+  type Recommendation,
+} from '@/features/recommend/api'
+import { SuggestionCard } from '@/features/recommend/SuggestionCard'
 
 const steps: { title: string; fields: FieldPath<PlantFormValues>[] }[] = [
   { title: 'What plant is it?', fields: [] },
@@ -103,6 +109,29 @@ function NewPlantScreen() {
   const last = step === steps.length
   const current = steps[step - 1]!
 
+  const suggest = useDraftRecommendation()
+  const [suggestion, setSuggestion] = useState<Recommendation | null>(null)
+  // Between the plant being saved and its AI schedule being written; the button stays busy.
+  const [finishing, setFinishing] = useState(false)
+
+  /** Step 5 opens with the AI schedule filled in; the user can still change any number. */
+  const askForSchedule = () =>
+    suggest.mutate(
+      { values: form.getValues(), species },
+      {
+        onSuccess: (r) => {
+          setSuggestion(r)
+          form.setValue('water_days_warm', r.water_days_warm)
+          form.setValue('water_days_cold', r.water_days_cold)
+          form.setValue('progress_days', r.progress_days)
+          form.setValue('tip', r.tip)
+          form.setValue('fert_mode', r.fertilizer.mode)
+          form.setValue('fert_n', r.fertilizer.n)
+          form.setValue('fert_months', r.fertilizer.months)
+        },
+      },
+    )
+
   const onSubmit = form.handleSubmit((values) =>
     create.mutate(
       {
@@ -112,16 +141,29 @@ function NewPlantScreen() {
         species,
       },
       {
-        onSuccess: ({ id }) =>
-          navigate({ to: '/plants/$plantId', params: { plantId: id }, replace: true }),
+        onSuccess: async ({ id }) => {
+          setFinishing(true)
+          // Untouched AI numbers are saved as the AI schedule, with its explanation.
+          const v = form.getValues()
+          if (
+            suggestion &&
+            v.water_days_warm === suggestion.water_days_warm &&
+            v.water_days_cold === suggestion.water_days_cold &&
+            v.progress_days === suggestion.progress_days
+          ) {
+            await applyRecommendation(id).catch(() => undefined)
+          }
+          await navigate({ to: '/plants/$plantId', params: { plantId: id }, replace: true })
+        },
       },
     ),
   )
 
   const onContinue = async (e: FormEvent) => {
     e.preventDefault()
-    if (last) return onSubmit()
+    if (last) return suggest.isPending ? undefined : onSubmit()
     if (await form.trigger(current.fields)) {
+      if (step + 1 === steps.length) askForSchedule()
       navigate({ to: '/new-plant', search: { step: step + 1, roomId } })
     }
   }
@@ -143,7 +185,7 @@ function NewPlantScreen() {
     'A photo and a name you’ll recognise in Today.',
     'Not sure? Pick the closest option, you can change it later.',
     room ? `Light and climate come from ${room.name}.` : 'Light and climate come from the room.',
-    'Set by hand for now. You can change it any time.',
+    'Suggested from the species, pot, spot and weather. Change anything you know better.',
   ]
 
   return (
@@ -156,8 +198,17 @@ function NewPlantScreen() {
         subtitle={subtitles[step - 1]}
         onSubmit={onContinue}
         bottomBar={
-          <Button type="submit" loading={create.isPending}>
-            {last ? `Add ${nickname || 'plant'}` : 'Continue'}
+          <Button
+            type="submit"
+            loading={create.isPending || finishing}
+            // Wait for the AI schedule; if it fails, the user can still add with their own numbers.
+            disabled={last && suggest.isPending}
+          >
+            {last && suggest.isPending
+              ? 'Getting a care schedule…'
+              : last
+                ? `Add ${nickname || 'plant'}`
+                : 'Continue'}
           </Button>
         }
       >
@@ -189,6 +240,19 @@ function NewPlantScreen() {
         {step === 4 && <PlantSpotFields />}
         {step === 5 && (
           <>
+            <SuggestionCard
+              state={
+                suggest.isPending
+                  ? 'loading'
+                  : suggest.isError
+                    ? 'error'
+                    : suggestion
+                      ? 'ready'
+                      : 'idle'
+              }
+              suggestion={suggestion}
+              onRetry={askForSchedule}
+            />
             <ScheduleFields />
             <FertilizerFields fertilizers={fertilizers} />
             <FormCard>

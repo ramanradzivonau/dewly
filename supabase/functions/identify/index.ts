@@ -2,20 +2,10 @@
 // POST multipart/form-data with `image` (a JPEG, resized on the device); the caller must be
 // signed in (the gateway verifies the JWT). Returns up to five candidates, best first.
 
+import { cors, json } from '../_shared/http.ts'
+
 const PLANTNET_URL = 'https://my-api.plantnet.org/v2/identify/all'
 const MAX_BYTES = 5 * 1024 * 1024
-
-const cors = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-}
-
-const json = (body: unknown, status = 200) =>
-  new Response(JSON.stringify(body), {
-    status,
-    headers: { ...cors, 'Content-Type': 'application/json' },
-  })
 
 type PlantNetResult = {
   score: number
