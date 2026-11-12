@@ -93,15 +93,26 @@ function PlantScreen() {
         </Link>
       </div>
 
+      <div className="grid grid-cols-2 gap-2">
+        <Link
+          to="/plants/$plantId/progress"
+          params={{ plantId }}
+          className="flex min-h-12 items-center justify-center gap-2 rounded-pill bg-primary text-label font-bold text-on-primary"
+        >
+          <CameraIcon width={20} height={20} />
+          Update progress
+        </Link>
+        <Link
+          to="/plants/$plantId/history"
+          params={{ plantId }}
+          className="flex min-h-12 items-center justify-center rounded-pill bg-track text-label font-bold text-primary"
+        >
+          History
+        </Link>
+      </div>
+
       <Schedule plant={plant} />
       <BasedOn plant={plant} />
-      <Link
-        to="/plants/$plantId/history"
-        params={{ plantId }}
-        className="flex min-h-12 w-full items-center justify-center rounded-pill bg-track text-label font-bold text-primary"
-      >
-        Care history
-      </Link>
     </main>
   )
 }

@@ -30,6 +30,7 @@ import { Route as AuthedWaterPlantIdRouteImport } from './routes/_authed/water.$
 import { Route as AuthedPlantsPlantIdIndexRouteImport } from './routes/_authed/plants/$plantId/index'
 import { Route as AuthedPlantsPlantIdEditRouteImport } from './routes/_authed/plants/$plantId/edit'
 import { Route as AuthedPlantsPlantIdHistoryRouteImport } from './routes/_authed/plants/$plantId/history'
+import { Route as AuthedPlantsPlantIdProgressRouteImport } from './routes/_authed/plants/$plantId/progress'
 import { Route as AuthedRoomsRoomIdIndexRouteImport } from './routes/_authed/rooms/$roomId/index'
 import { Route as AuthedRoomsRoomIdEditRouteImport } from './routes/_authed/rooms/$roomId/edit'
 
@@ -138,6 +139,12 @@ const AuthedPlantsPlantIdHistoryRoute =
     path: '/plants/$plantId/history',
     getParentRoute: () => AuthedRoute,
   } as any)
+const AuthedPlantsPlantIdProgressRoute =
+  AuthedPlantsPlantIdProgressRouteImport.update({
+    id: '/plants/$plantId/progress',
+    path: '/plants/$plantId/progress',
+    getParentRoute: () => AuthedRoute,
+  } as any)
 const AuthedRoomsRoomIdIndexRoute = AuthedRoomsRoomIdIndexRouteImport.update({
   id: '/rooms/$roomId/',
   path: '/rooms/$roomId/',
@@ -167,6 +174,7 @@ export interface FileRoutesByFullPath {
   '/water/$plantId': typeof AuthedWaterPlantIdRoute
   '/plants/$plantId/edit': typeof AuthedPlantsPlantIdEditRoute
   '/plants/$plantId/history': typeof AuthedPlantsPlantIdHistoryRoute
+  '/plants/$plantId/progress': typeof AuthedPlantsPlantIdProgressRoute
   '/rooms/$roomId/edit': typeof AuthedRoomsRoomIdEditRoute
   '/plants/$plantId/': typeof AuthedPlantsPlantIdIndexRoute
   '/rooms/$roomId/': typeof AuthedRoomsRoomIdIndexRoute
@@ -189,6 +197,7 @@ export interface FileRoutesByTo {
   '/water/$plantId': typeof AuthedWaterPlantIdRoute
   '/plants/$plantId/edit': typeof AuthedPlantsPlantIdEditRoute
   '/plants/$plantId/history': typeof AuthedPlantsPlantIdHistoryRoute
+  '/plants/$plantId/progress': typeof AuthedPlantsPlantIdProgressRoute
   '/rooms/$roomId/edit': typeof AuthedRoomsRoomIdEditRoute
   '/plants/$plantId': typeof AuthedPlantsPlantIdIndexRoute
   '/rooms/$roomId': typeof AuthedRoomsRoomIdIndexRoute
@@ -215,6 +224,7 @@ export interface FileRoutesById {
   '/_authed/water/$plantId': typeof AuthedWaterPlantIdRoute
   '/_authed/plants/$plantId/edit': typeof AuthedPlantsPlantIdEditRoute
   '/_authed/plants/$plantId/history': typeof AuthedPlantsPlantIdHistoryRoute
+  '/_authed/plants/$plantId/progress': typeof AuthedPlantsPlantIdProgressRoute
   '/_authed/rooms/$roomId/edit': typeof AuthedRoomsRoomIdEditRoute
   '/_authed/plants/$plantId/': typeof AuthedPlantsPlantIdIndexRoute
   '/_authed/rooms/$roomId/': typeof AuthedRoomsRoomIdIndexRoute
@@ -239,6 +249,7 @@ export interface FileRouteTypes {
     | '/water/$plantId'
     | '/plants/$plantId/edit'
     | '/plants/$plantId/history'
+    | '/plants/$plantId/progress'
     | '/rooms/$roomId/edit'
     | '/plants/$plantId/'
     | '/rooms/$roomId/'
@@ -261,6 +272,7 @@ export interface FileRouteTypes {
     | '/water/$plantId'
     | '/plants/$plantId/edit'
     | '/plants/$plantId/history'
+    | '/plants/$plantId/progress'
     | '/rooms/$roomId/edit'
     | '/plants/$plantId'
     | '/rooms/$roomId'
@@ -286,6 +298,7 @@ export interface FileRouteTypes {
     | '/_authed/water/$plantId'
     | '/_authed/plants/$plantId/edit'
     | '/_authed/plants/$plantId/history'
+    | '/_authed/plants/$plantId/progress'
     | '/_authed/rooms/$roomId/edit'
     | '/_authed/plants/$plantId/'
     | '/_authed/rooms/$roomId/'
@@ -448,6 +461,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedPlantsPlantIdHistoryRouteImport
       parentRoute: typeof AuthedRoute
     }
+    '/_authed/plants/$plantId/progress': {
+      id: '/_authed/plants/$plantId/progress'
+      path: '/plants/$plantId/progress'
+      fullPath: '/plants/$plantId/progress'
+      preLoaderRoute: typeof AuthedPlantsPlantIdProgressRouteImport
+      parentRoute: typeof AuthedRoute
+    }
     '/_authed/rooms/$roomId/': {
       id: '/_authed/rooms/$roomId/'
       path: '/rooms/$roomId'
@@ -491,6 +511,7 @@ interface AuthedRouteChildren {
   AuthedWaterPlantIdRoute: typeof AuthedWaterPlantIdRoute
   AuthedPlantsPlantIdEditRoute: typeof AuthedPlantsPlantIdEditRoute
   AuthedPlantsPlantIdHistoryRoute: typeof AuthedPlantsPlantIdHistoryRoute
+  AuthedPlantsPlantIdProgressRoute: typeof AuthedPlantsPlantIdProgressRoute
   AuthedRoomsRoomIdEditRoute: typeof AuthedRoomsRoomIdEditRoute
   AuthedPlantsPlantIdIndexRoute: typeof AuthedPlantsPlantIdIndexRoute
   AuthedRoomsRoomIdIndexRoute: typeof AuthedRoomsRoomIdIndexRoute
@@ -506,6 +527,7 @@ const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedWaterPlantIdRoute: AuthedWaterPlantIdRoute,
   AuthedPlantsPlantIdEditRoute: AuthedPlantsPlantIdEditRoute,
   AuthedPlantsPlantIdHistoryRoute: AuthedPlantsPlantIdHistoryRoute,
+  AuthedPlantsPlantIdProgressRoute: AuthedPlantsPlantIdProgressRoute,
   AuthedRoomsRoomIdEditRoute: AuthedRoomsRoomIdEditRoute,
   AuthedPlantsPlantIdIndexRoute: AuthedPlantsPlantIdIndexRoute,
   AuthedRoomsRoomIdIndexRoute: AuthedRoomsRoomIdIndexRoute,
