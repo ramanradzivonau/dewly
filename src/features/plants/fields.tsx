@@ -5,6 +5,7 @@ import { Controller, useFormContext, useWatch, type FieldPath } from 'react-hook
 import { FormCard } from '@/components/FormScreen'
 import { ChoiceGroup, Switch } from '@/components/ui/ChoiceGroup'
 import { NumberSlider } from '@/components/ui/NumberSlider'
+import { Dropdown } from '@/components/ui/Dropdown'
 import { TextField } from '@/components/ui/TextField'
 import { doseUnits, type Fertilizer } from '@/features/fertilizers/api'
 import type { Room } from '@/features/rooms/api'
@@ -452,11 +453,11 @@ export function FertilizerFields({ fertilizers }: { fertilizers: Fertilizer[] })
           control={control}
           name="fertilizer_id"
           render={({ field }) => (
-            <ChoiceGroup
-              label="Fertilizer"
+            <Dropdown
+              label="Which fertilizer"
               options={[
-                ...fertilizers.map((f) => ({ value: f.id, label: f.name })),
                 { value: '', label: 'None' },
+                ...fertilizers.map((f) => ({ value: f.id, label: f.name })),
               ]}
               value={field.value}
               onChange={field.onChange}
@@ -467,6 +468,9 @@ export function FertilizerFields({ fertilizers }: { fertilizers: Fertilizer[] })
 
       {fertilizer && (
         <>
+          <h3 className="mt-2 border-t border-divider pt-4 text-field-label font-extrabold text-ink">
+            How often
+          </h3>
           <Controller
             control={control}
             name="fert_mode"
@@ -498,7 +502,9 @@ export function FertilizerFields({ fertilizers }: { fertilizers: Fertilizer[] })
             <p className="text-right text-caption text-danger">{errors.fert_n.message}</p>
           )}
 
-          <h3 className="mt-1 text-field-label font-extrabold text-ink">Active months</h3>
+          <h3 className="mt-2 border-t border-divider pt-4 text-field-label font-extrabold text-ink">
+            Active months
+          </h3>
           <Controller
             control={control}
             name="fert_months"
@@ -534,8 +540,8 @@ export function FertilizerFields({ fertilizers }: { fertilizers: Fertilizer[] })
             <p className="text-caption text-danger">{errors.fert_months.message}</p>
           )}
 
-          <div className="flex flex-col gap-1">
-            <label htmlFor={doseId} className="text-body font-semibold text-ink">
+          <div className="mt-2 flex flex-col gap-1 border-t border-divider pt-4">
+            <label htmlFor={doseId} className="text-field-label font-extrabold text-ink">
               Dose
             </label>
             <div className="flex items-center gap-2.5">

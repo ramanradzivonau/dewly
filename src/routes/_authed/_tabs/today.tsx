@@ -63,7 +63,7 @@ function TodayScreen() {
       </header>
 
       {open.length > 0 && (
-        <div className="flex gap-2.5 overflow-x-auto px-1">
+        <div className="-mx-4 scrollbar-none flex gap-2.5 overflow-x-auto px-5">
           <Chip tone="bg-primary-soft text-primary" dot="bg-primary-text">
             {open.length === 1 ? '1 task today' : `${open.length} tasks today`}
           </Chip>

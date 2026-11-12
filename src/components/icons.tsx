@@ -158,3 +158,11 @@ export function FlaskIcon(props: IconProps) {
     </svg>
   )
 }
+
+export function ChevronDownIcon(props: IconProps) {
+  return (
+    <svg {...base} strokeWidth={2.2} {...props}>
+      <path d="M5 9l7 7 7-7" />
+    </svg>
+  )
+}

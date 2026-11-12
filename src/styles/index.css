@@ -13,3 +13,11 @@
     overscroll-behavior-y: none;
   }
 }
+
+/* Horizontal chip strips: swipeable, without a visible scrollbar on desktop browsers. */
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
