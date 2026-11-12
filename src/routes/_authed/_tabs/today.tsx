@@ -15,6 +15,7 @@ import {
 import { UpcomingCalendar, UpcomingList } from '@/features/care/Upcoming'
 import { formatDose, shortDose } from '@/features/fertilizers/api'
 import { PlantPhoto } from '@/features/plants/PlantPhoto'
+import { toast } from '@/lib/toast'
 
 export const Route = createFileRoute('/_authed/_tabs/today')({
   // Today / Upcoming tabs and the Upcoming view live in the URL, so Back keeps them.
@@ -209,11 +210,21 @@ function CheckRow({ task }: { task: DueTask }) {
   const checked = doing ? true : undo.isPending ? false : done
   const verb = isWater ? 'watered' : 'fertilized'
 
+  // The tick springs back on failure; a toast says why.
+  const onError = () =>
+    toast(
+      navigator.onLine
+        ? `Couldn’t save ${task.nickname}. Try again.`
+        : 'You’re offline. Nothing was saved.',
+      'error',
+    )
+
   const toggle = () => {
     if (doing || undo.isPending) return
-    if (task.done_today_event_id) undo.mutate(task.done_today_event_id)
-    else if (isWater) water.mutate({ plantId: task.plant_id, withFertilizer: task.with_fertilizer })
-    else fertilize.mutate(task.plant_id)
+    if (task.done_today_event_id) undo.mutate(task.done_today_event_id, { onError })
+    else if (isWater)
+      water.mutate({ plantId: task.plant_id, withFertilizer: task.with_fertilizer }, { onError })
+    else fertilize.mutate(task.plant_id, { onError })
   }
 
   const dose =

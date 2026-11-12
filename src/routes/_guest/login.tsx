@@ -2,10 +2,12 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { AuthError } from '@supabase/supabase-js'
 import { useMutation } from '@tanstack/react-query'
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 import { authErrorMessage } from '@/auth/errors'
+import { takeOAuthError } from '@/auth/oauthError'
 import { GoogleButton, OrWithEmail } from '@/auth/GoogleButton'
 import { loginSchema } from '@/auth/schemas'
 import { FormScreen, FormCard, FormError } from '@/components/FormScreen'
@@ -23,6 +25,7 @@ type LoginValues = z.infer<typeof loginSchema>
 
 function LoginScreen() {
   const { redirect } = Route.useSearch()
+  const [oauthError] = useState(takeOAuthError)
   const navigate = useNavigate()
   const {
     register,
@@ -54,6 +57,7 @@ function LoginScreen() {
       subtitle="Log in to see what your plants need today."
       onSubmit={handleSubmit((values) => login.mutate(values))}
     >
+      <FormError message={oauthError ? `Google sign-in didn’t work: ${oauthError}` : null} />
       <GoogleButton label="Continue with Google" redirect={redirect} />
       <OrWithEmail />
 

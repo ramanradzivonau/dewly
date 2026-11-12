@@ -52,9 +52,25 @@ async function recommend(body: Record<string, unknown>) {
   return responseSchema.parse(data)
 }
 
+/**
+ * Gemini answers 502 (busy or slow) or 429 (limit) in load spikes that pass in a minute or two;
+ * those are worth asking again. Anything else (bad input, no network) is not.
+ */
+const busyRetry = (times: number) => ({
+  retry: (count: number, error: unknown) => count < times && isBusy(error),
+  retryDelay: 20_000,
+})
+
+export function isBusy(error: unknown) {
+  const status = (error as { context?: { status?: number } } | null)?.context?.status
+  return status === 502 || status === 429
+}
+
 /** Step 5 of Add plant: a schedule for a plant that isn't saved yet. */
 export function useDraftRecommendation() {
   return useMutation({
+    // One more try: the Add button waits on this.
+    ...busyRetry(1),
     mutationFn: ({ values, species }: { values: PlantFormValues; species: SpeciesPick | null }) =>
       recommend({
         draft: {
@@ -80,6 +96,7 @@ export function useDraftRecommendation() {
 export function useRecommend(plantId: string) {
   const queryClient = useQueryClient()
   return useMutation({
+    ...busyRetry(2),
     mutationFn: (force: boolean) => recommend({ plant_id: plantId, force }),
     onSuccess: () =>
       Promise.all([

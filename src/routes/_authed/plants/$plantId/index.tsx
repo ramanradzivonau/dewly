@@ -208,7 +208,13 @@ function AiActions({ plant }: { plant: Plant }) {
         className="flex min-h-12 items-center justify-center gap-2 rounded-pill border-[1.5px] border-primary text-body font-bold text-primary disabled:opacity-60"
       >
         <SparkleIcon width={18} height={18} />
-        {recommend.isPending ? 'Asking…' : custom ? 'Use AI recommendation' : 'Recalculate'}
+        {recommend.isPending
+          ? recommend.failureCount > 0
+            ? 'Gemini is busy, trying again…'
+            : 'Asking…'
+          : custom
+            ? 'Use AI recommendation'
+            : 'Recalculate'}
       </button>
     </div>
   )

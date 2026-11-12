@@ -243,7 +243,9 @@ function NewPlantScreen() {
             <SuggestionCard
               state={
                 suggest.isPending
-                  ? 'loading'
+                  ? suggest.failureCount > 0
+                    ? 'retrying'
+                    : 'loading'
                   : suggest.isError
                     ? 'error'
                     : suggestion
