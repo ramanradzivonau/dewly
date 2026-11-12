@@ -96,7 +96,9 @@ Deno.serve(async (req) => {
     let sent = 0
     for (const digest of (data ?? []) as Digest[]) {
       const body = summary(digest)
-      if (body) sent += await send(digest.user_id, { title: 'Dewly', body, url: '/today' })
+      // iOS adds "from Dewly" under the title, so the title says what it's about.
+      if (body)
+        sent += await send(digest.user_id, { title: 'Plants need you today', body, url: '/today' })
     }
     await admin.rpc('prune_reminder_log')
     return json({ users: (data ?? []).length, sent })
@@ -115,8 +117,8 @@ Deno.serve(async (req) => {
     const body = (await req.json().catch(() => null)) as { test?: boolean } | null
     if (user && body?.test) {
       const sent = await send(user.id, {
-        title: 'Dewly',
-        body: 'Reminders are on. You’ll get a summary at your reminder times.',
+        title: 'Reminders are on',
+        body: 'You’ll get a summary of what’s left at your reminder times.',
         url: '/today',
       })
       return json({ sent })
