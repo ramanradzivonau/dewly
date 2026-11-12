@@ -18,6 +18,12 @@ export function authErrorMessage(error: unknown): string {
       case 'user_already_exists':
       case 'email_exists':
         return 'This email is already registered. Log in instead.'
+      case 'manual_linking_disabled':
+        return 'Linking accounts is turned off on the server. Turn on manual linking in Supabase.'
+      case 'identity_already_exists':
+        return 'This Google account is already linked to another Dewly account.'
+      case 'single_identity_not_deletable':
+        return 'This is your only way to sign in, so it can’t be removed.'
       case 'same_password':
         return 'The new password must be different from the old one.'
     }

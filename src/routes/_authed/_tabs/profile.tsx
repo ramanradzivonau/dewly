@@ -1,4 +1,4 @@
-import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Link, type LinkProps } from '@tanstack/react-router'
 import type { ComponentType, ReactNode, SVGProps } from 'react'
 
@@ -6,6 +6,8 @@ import {
   BellIcon,
   ChevronRightIcon,
   FlaskIcon,
+  GoogleIcon,
+  LockIcon,
   LogOutIcon,
   MailIcon,
   PersonIcon,
@@ -13,6 +15,7 @@ import {
   PlusIcon,
   TrashIcon,
 } from '@/components/icons'
+import { authUserQuery, googleIdentity, hasPassword } from '@/features/account/api'
 import { fertilizersQuery, fertilizerTypeOptions, formatDose } from '@/features/fertilizers/api'
 import { profileQuery } from '@/features/profile/api'
 import { supabase } from '@/lib/supabase'
@@ -29,6 +32,9 @@ function ProfileScreen() {
   // Loaded by the _tabs guard, so this never suspends on first render.
   const { data: profile } = useSuspenseQuery(profileQuery(user.id))
   const name = profile.display_name ?? ''
+  // Fresh from Auth: the session copy doesn't see email, password or Google changes.
+  const authUser = useQuery(authUserQuery()).data
+  const email = authUser?.email ?? user.email
 
   // The _authed guard sends the user to Log in once the session is gone.
   const logOut = useMutation({
@@ -56,7 +62,19 @@ function ProfileScreen() {
           label="Display name"
           value={name || 'Add your name'}
         />
-        <Row Icon={MailIcon} label="Email" sub={user.email} />
+        <Row to="/profile/email" Icon={MailIcon} label="Email" sub={email} />
+        <Row
+          to="/profile/password"
+          Icon={LockIcon}
+          label="Password"
+          value={authUser && !hasPassword(authUser) ? 'Set' : 'Change'}
+        />
+        <Row
+          to="/profile/google"
+          Icon={GoogleIcon}
+          label="Google"
+          value={authUser && googleIdentity(authUser) ? 'Linked' : 'Not linked'}
+        />
       </Section>
 
       <Section title="Location">

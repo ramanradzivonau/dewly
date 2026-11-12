@@ -233,3 +233,20 @@ export function LogOutIcon(props: IconProps) {
     </svg>
   )
 }
+
+export function LockIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M6 11h12v9H6zM9 11V8a3 3 0 0 1 6 0v3" />
+    </svg>
+  )
+}
+
+/** Outline "G" for rows; the brand mark (assets/google-g.svg) is for sign-in buttons. */
+export function GoogleIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M12 3a9 9 0 1 0 8.7 11.3H12v-3.6h8.6" />
+    </svg>
+  )
+}

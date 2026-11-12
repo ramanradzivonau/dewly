@@ -27,7 +27,10 @@ import { Route as AuthedFertilizersFertilizerIdRouteImport } from './routes/_aut
 import { Route as AuthedFertilizersNewRouteImport } from './routes/_authed/fertilizers/new'
 import { Route as AuthedOnboardingCityRouteImport } from './routes/_authed/onboarding/city'
 import { Route as AuthedProfileDeleteRouteImport } from './routes/_authed/profile/delete'
+import { Route as AuthedProfileEmailRouteImport } from './routes/_authed/profile/email'
+import { Route as AuthedProfileGoogleRouteImport } from './routes/_authed/profile/google'
 import { Route as AuthedProfileNameRouteImport } from './routes/_authed/profile/name'
+import { Route as AuthedProfilePasswordRouteImport } from './routes/_authed/profile/password'
 import { Route as AuthedRoomsNewRouteImport } from './routes/_authed/rooms/new'
 import { Route as AuthedWaterPlantIdRouteImport } from './routes/_authed/water.$plantId'
 import { Route as AuthedPlantsPlantIdIndexRouteImport } from './routes/_authed/plants/$plantId/index'
@@ -125,9 +128,24 @@ const AuthedProfileDeleteRoute = AuthedProfileDeleteRouteImport.update({
   path: '/profile/delete',
   getParentRoute: () => AuthedRoute,
 } as any)
+const AuthedProfileEmailRoute = AuthedProfileEmailRouteImport.update({
+  id: '/profile/email',
+  path: '/profile/email',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedProfileGoogleRoute = AuthedProfileGoogleRouteImport.update({
+  id: '/profile/google',
+  path: '/profile/google',
+  getParentRoute: () => AuthedRoute,
+} as any)
 const AuthedProfileNameRoute = AuthedProfileNameRouteImport.update({
   id: '/profile/name',
   path: '/profile/name',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedProfilePasswordRoute = AuthedProfilePasswordRouteImport.update({
+  id: '/profile/password',
+  path: '/profile/password',
   getParentRoute: () => AuthedRoute,
 } as any)
 const AuthedRoomsNewRoute = AuthedRoomsNewRouteImport.update({
@@ -190,7 +208,10 @@ export interface FileRoutesByFullPath {
   '/fertilizers/new': typeof AuthedFertilizersNewRoute
   '/onboarding/city': typeof AuthedOnboardingCityRoute
   '/profile/delete': typeof AuthedProfileDeleteRoute
+  '/profile/email': typeof AuthedProfileEmailRoute
+  '/profile/google': typeof AuthedProfileGoogleRoute
   '/profile/name': typeof AuthedProfileNameRoute
+  '/profile/password': typeof AuthedProfilePasswordRoute
   '/rooms/new': typeof AuthedRoomsNewRoute
   '/water/$plantId': typeof AuthedWaterPlantIdRoute
   '/plants/$plantId/edit': typeof AuthedPlantsPlantIdEditRoute
@@ -216,7 +237,10 @@ export interface FileRoutesByTo {
   '/fertilizers/new': typeof AuthedFertilizersNewRoute
   '/onboarding/city': typeof AuthedOnboardingCityRoute
   '/profile/delete': typeof AuthedProfileDeleteRoute
+  '/profile/email': typeof AuthedProfileEmailRoute
+  '/profile/google': typeof AuthedProfileGoogleRoute
   '/profile/name': typeof AuthedProfileNameRoute
+  '/profile/password': typeof AuthedProfilePasswordRoute
   '/rooms/new': typeof AuthedRoomsNewRoute
   '/water/$plantId': typeof AuthedWaterPlantIdRoute
   '/plants/$plantId/edit': typeof AuthedPlantsPlantIdEditRoute
@@ -246,7 +270,10 @@ export interface FileRoutesById {
   '/_authed/fertilizers/new': typeof AuthedFertilizersNewRoute
   '/_authed/onboarding/city': typeof AuthedOnboardingCityRoute
   '/_authed/profile/delete': typeof AuthedProfileDeleteRoute
+  '/_authed/profile/email': typeof AuthedProfileEmailRoute
+  '/_authed/profile/google': typeof AuthedProfileGoogleRoute
   '/_authed/profile/name': typeof AuthedProfileNameRoute
+  '/_authed/profile/password': typeof AuthedProfilePasswordRoute
   '/_authed/rooms/new': typeof AuthedRoomsNewRoute
   '/_authed/water/$plantId': typeof AuthedWaterPlantIdRoute
   '/_authed/plants/$plantId/edit': typeof AuthedPlantsPlantIdEditRoute
@@ -274,7 +301,10 @@ export interface FileRouteTypes {
     | '/fertilizers/new'
     | '/onboarding/city'
     | '/profile/delete'
+    | '/profile/email'
+    | '/profile/google'
     | '/profile/name'
+    | '/profile/password'
     | '/rooms/new'
     | '/water/$plantId'
     | '/plants/$plantId/edit'
@@ -300,7 +330,10 @@ export interface FileRouteTypes {
     | '/fertilizers/new'
     | '/onboarding/city'
     | '/profile/delete'
+    | '/profile/email'
+    | '/profile/google'
     | '/profile/name'
+    | '/profile/password'
     | '/rooms/new'
     | '/water/$plantId'
     | '/plants/$plantId/edit'
@@ -329,7 +362,10 @@ export interface FileRouteTypes {
     | '/_authed/fertilizers/new'
     | '/_authed/onboarding/city'
     | '/_authed/profile/delete'
+    | '/_authed/profile/email'
+    | '/_authed/profile/google'
     | '/_authed/profile/name'
+    | '/_authed/profile/password'
     | '/_authed/rooms/new'
     | '/_authed/water/$plantId'
     | '/_authed/plants/$plantId/edit'
@@ -476,11 +512,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedProfileDeleteRouteImport
       parentRoute: typeof AuthedRoute
     }
+    '/_authed/profile/email': {
+      id: '/_authed/profile/email'
+      path: '/profile/email'
+      fullPath: '/profile/email'
+      preLoaderRoute: typeof AuthedProfileEmailRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/profile/google': {
+      id: '/_authed/profile/google'
+      path: '/profile/google'
+      fullPath: '/profile/google'
+      preLoaderRoute: typeof AuthedProfileGoogleRouteImport
+      parentRoute: typeof AuthedRoute
+    }
     '/_authed/profile/name': {
       id: '/_authed/profile/name'
       path: '/profile/name'
       fullPath: '/profile/name'
       preLoaderRoute: typeof AuthedProfileNameRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/profile/password': {
+      id: '/_authed/profile/password'
+      path: '/profile/password'
+      fullPath: '/profile/password'
+      preLoaderRoute: typeof AuthedProfilePasswordRouteImport
       parentRoute: typeof AuthedRoute
     }
     '/_authed/rooms/new': {
@@ -566,7 +623,10 @@ interface AuthedRouteChildren {
   AuthedFertilizersNewRoute: typeof AuthedFertilizersNewRoute
   AuthedOnboardingCityRoute: typeof AuthedOnboardingCityRoute
   AuthedProfileDeleteRoute: typeof AuthedProfileDeleteRoute
+  AuthedProfileEmailRoute: typeof AuthedProfileEmailRoute
+  AuthedProfileGoogleRoute: typeof AuthedProfileGoogleRoute
   AuthedProfileNameRoute: typeof AuthedProfileNameRoute
+  AuthedProfilePasswordRoute: typeof AuthedProfilePasswordRoute
   AuthedRoomsNewRoute: typeof AuthedRoomsNewRoute
   AuthedWaterPlantIdRoute: typeof AuthedWaterPlantIdRoute
   AuthedPlantsPlantIdEditRoute: typeof AuthedPlantsPlantIdEditRoute
@@ -585,7 +645,10 @@ const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedFertilizersNewRoute: AuthedFertilizersNewRoute,
   AuthedOnboardingCityRoute: AuthedOnboardingCityRoute,
   AuthedProfileDeleteRoute: AuthedProfileDeleteRoute,
+  AuthedProfileEmailRoute: AuthedProfileEmailRoute,
+  AuthedProfileGoogleRoute: AuthedProfileGoogleRoute,
   AuthedProfileNameRoute: AuthedProfileNameRoute,
+  AuthedProfilePasswordRoute: AuthedProfilePasswordRoute,
   AuthedRoomsNewRoute: AuthedRoomsNewRoute,
   AuthedWaterPlantIdRoute: AuthedWaterPlantIdRoute,
   AuthedPlantsPlantIdEditRoute: AuthedPlantsPlantIdEditRoute,
