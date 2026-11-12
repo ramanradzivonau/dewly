@@ -24,6 +24,7 @@ export type CareSchedule = {
   progress_days: number
   source: 'ai' | 'custom'
   explanation: string | null
+  computed_at: string | null
   fertilizer_id: string | null
   fert_mode: FertMode | null
   fert_n: number | null
@@ -49,13 +50,18 @@ export type Plant = {
   grow_light_hours: number | null
   room: Room
   schedule: CareSchedule | null
-  species: { scientific_name: string; common_name: string | null } | null
+  species: {
+    scientific_name: string
+    common_name: string | null
+    /** From Gemini, unchecked JSON; parse with careInfoSchema before use. */
+    care_info: unknown
+  } | null
 }
 
 const plantColumns =
   'id, room_id, species_id, nickname, cover_photo, pot_type, pot_diameter_cm, drainage, soil, repotted_on, height_cm, born_on, near, grow_light_hours'
 const scheduleColumns =
-  'water_days_warm, water_days_cold, tip, progress_days, source, explanation, fertilizer_id, fert_mode, fert_n, fert_months, fert_dose, fertilizer:fertilizers (id, name, type, dose)'
+  'water_days_warm, water_days_cold, tip, progress_days, source, explanation, computed_at, fertilizer_id, fert_mode, fert_n, fert_months, fert_dose, fertilizer:fertilizers (id, name, type, dose)'
 
 export const plantsKey = ['plants'] as const
 
@@ -68,7 +74,7 @@ export const plantQuery = (id: string) =>
       const { data, error } = await supabase
         .from('plants')
         .select(
-          `${plantColumns}, room:rooms (${roomColumns}), schedule:care_schedules (${scheduleColumns}), species (scientific_name, common_name)`,
+          `${plantColumns}, room:rooms (${roomColumns}), schedule:care_schedules (${scheduleColumns}), species (scientific_name, common_name, care_info)`,
         )
         .eq('id', id)
         .maybeSingle()

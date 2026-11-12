@@ -1,0 +1,94 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { z } from 'zod'
+
+import { tasksKey } from '@/features/care/keys'
+import { plantsKey } from '@/features/plants/api'
+import type { PlantFormValues } from '@/features/plants/options'
+import type { SpeciesPick } from '@/features/species/api'
+import { supabase } from '@/lib/supabase'
+
+const toxicity = z.enum(['toxic', 'non_toxic', 'unknown'])
+
+/** Species care info from Gemini, cached on the species row. */
+export const careInfoSchema = z.object({
+  light: z.string(),
+  watering: z.string(),
+  soil: z.string(),
+  humidity: z.string(),
+  temperature: z.string(),
+  growth_rate: z.enum(['slow', 'medium', 'fast']),
+  recommended_soil: z.enum(['universal', 'aroid_mix', 'cactus_mix', 'peat']),
+  pot_diameter_cm: z.object({ min: z.number(), max: z.number() }),
+  toxicity: z.object({ cats: toxicity, dogs: toxicity, note: z.string() }),
+})
+export type CareInfo = z.infer<typeof careInfoSchema>
+
+const responseSchema = z.object({
+  recommendation: z.object({
+    water_days_warm: z.number().int(),
+    water_days_cold: z.number().int(),
+    progress_days: z.number().int(),
+    tip: z.string(),
+    explanation: z.string(),
+    fertilizer: z.object({
+      mode: z.enum(['every_n_waterings', 'every_n_weeks']),
+      n: z.number().int(),
+      months: z.array(z.number().int()),
+    }),
+    care_info: careInfoSchema,
+  }),
+  applied: z.boolean(),
+})
+
+export type Recommendation = z.infer<typeof responseSchema>['recommendation']
+
+async function recommend(body: Record<string, unknown>) {
+  const { data, error } = await supabase.functions.invoke('recommend', {
+    body,
+    // The function gives up on Gemini after 45 s; don't spin forever if the network hangs.
+    signal: AbortSignal.timeout(60_000),
+  })
+  if (error) throw error
+  return responseSchema.parse(data)
+}
+
+/** Step 5 of Add plant: a schedule for a plant that isn't saved yet. */
+export function useDraftRecommendation() {
+  return useMutation({
+    mutationFn: ({ values, species }: { values: PlantFormValues; species: SpeciesPick | null }) =>
+      recommend({
+        draft: {
+          room_id: values.room_id,
+          species: species
+            ? { scientific_name: species.scientific_name, common_name: species.common_name }
+            : null,
+          pot_type: values.pot_type,
+          pot_diameter_cm: values.pot_diameter_cm,
+          drainage: values.drainage,
+          soil: values.soil === 'custom' ? values.soil_custom : values.soil,
+          repotted_on: values.repotted_on,
+          height_cm: values.height_cm,
+          born_on: values.born_on,
+          near: values.near,
+          grow_light_hours: values.grow_light ? values.grow_light_hours : null,
+        },
+      }).then((r) => r.recommendation),
+  })
+}
+
+/** Recalculate a saved plant; `force` also replaces a custom schedule. */
+export function useRecommend(plantId: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (force: boolean) => recommend({ plant_id: plantId, force }),
+    onSuccess: () =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: [...plantsKey, plantId] }),
+        queryClient.invalidateQueries({ queryKey: tasksKey }),
+      ]),
+  })
+}
+
+/** Saves the AI schedule for a just-created plant; the answer comes from the cache. */
+export const applyRecommendation = (plantId: string) =>
+  recommend({ plant_id: plantId, force: true })
