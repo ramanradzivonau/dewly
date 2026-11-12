@@ -1,6 +1,7 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useState, type FormEvent } from 'react'
+import { z } from 'zod'
 
 import { FormScreen, FormCard, FormError } from '@/components/FormScreen'
 import { Button } from '@/components/ui/Button'
@@ -13,14 +14,20 @@ import {
   placeSearchQuery,
   type Place,
 } from '@/features/profile/places'
+import { tasksKey } from '@/features/care/keys'
+import { aiSchedules, recalculate } from '@/features/recommend/api'
 import { useDebouncedValue } from '@/lib/useDebouncedValue'
 
 export const Route = createFileRoute('/_authed/onboarding/city')({
+  // from=profile: changing the city later, from Profile, rather than finishing sign-up.
+  validateSearch: z.object({ from: z.literal('profile').optional().catch(undefined) }),
   component: CityScreen,
 })
 
 function CityScreen() {
   const { user } = Route.useRouteContext()
+  const { from } = Route.useSearch()
+  const queryClient = useQueryClient()
   const navigate = useNavigate()
   const [query, setQuery] = useState('')
   const [selected, setSelected] = useState<Place | null>(null)
@@ -52,7 +59,17 @@ function CityScreen() {
         lon: selected.longitude,
         timezone: selected.timezone ?? null,
       },
-      { onSuccess: () => navigate({ to: '/today', replace: true }) },
+      {
+        onSuccess: () => {
+          if (from !== 'profile') return navigate({ to: '/today', replace: true })
+          // New city, new weather and day length: refresh AI schedules in the background.
+          void aiSchedules()
+            .then(recalculate)
+            .then(() => queryClient.invalidateQueries({ queryKey: tasksKey }))
+            .catch(() => undefined)
+          return navigate({ to: '/profile', replace: true })
+        },
+      },
     )
   }
 
@@ -61,13 +78,14 @@ function CityScreen() {
 
   return (
     <FormScreen
-      step="Step 3 of 3"
-      title="Where do your plants live?"
+      step={from === 'profile' ? undefined : 'Step 3 of 3'}
+      back={from === 'profile' ? { to: '/profile', label: 'Back to Profile' } : undefined}
+      title={from === 'profile' ? 'City' : 'Where do your plants live?'}
       subtitle="Outdoor temperature and daylight change how often plants need water. Only the city is stored."
       onSubmit={onSubmit}
       bottomBar={
         <Button type="submit" loading={save.isPending}>
-          Continue
+          {from === 'profile' ? 'Save' : 'Continue'}
         </Button>
       }
     >

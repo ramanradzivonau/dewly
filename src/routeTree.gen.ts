@@ -26,6 +26,8 @@ import { Route as AuthedTabsTodayRouteImport } from './routes/_authed/_tabs/toda
 import { Route as AuthedFertilizersFertilizerIdRouteImport } from './routes/_authed/fertilizers/$fertilizerId'
 import { Route as AuthedFertilizersNewRouteImport } from './routes/_authed/fertilizers/new'
 import { Route as AuthedOnboardingCityRouteImport } from './routes/_authed/onboarding/city'
+import { Route as AuthedProfileDeleteRouteImport } from './routes/_authed/profile/delete'
+import { Route as AuthedProfileNameRouteImport } from './routes/_authed/profile/name'
 import { Route as AuthedRoomsNewRouteImport } from './routes/_authed/rooms/new'
 import { Route as AuthedWaterPlantIdRouteImport } from './routes/_authed/water.$plantId'
 import { Route as AuthedPlantsPlantIdIndexRouteImport } from './routes/_authed/plants/$plantId/index'
@@ -118,6 +120,16 @@ const AuthedOnboardingCityRoute = AuthedOnboardingCityRouteImport.update({
   path: '/onboarding/city',
   getParentRoute: () => AuthedRoute,
 } as any)
+const AuthedProfileDeleteRoute = AuthedProfileDeleteRouteImport.update({
+  id: '/profile/delete',
+  path: '/profile/delete',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedProfileNameRoute = AuthedProfileNameRouteImport.update({
+  id: '/profile/name',
+  path: '/profile/name',
+  getParentRoute: () => AuthedRoute,
+} as any)
 const AuthedRoomsNewRoute = AuthedRoomsNewRouteImport.update({
   id: '/rooms/new',
   path: '/rooms/new',
@@ -177,6 +189,8 @@ export interface FileRoutesByFullPath {
   '/fertilizers/$fertilizerId': typeof AuthedFertilizersFertilizerIdRoute
   '/fertilizers/new': typeof AuthedFertilizersNewRoute
   '/onboarding/city': typeof AuthedOnboardingCityRoute
+  '/profile/delete': typeof AuthedProfileDeleteRoute
+  '/profile/name': typeof AuthedProfileNameRoute
   '/rooms/new': typeof AuthedRoomsNewRoute
   '/water/$plantId': typeof AuthedWaterPlantIdRoute
   '/plants/$plantId/edit': typeof AuthedPlantsPlantIdEditRoute
@@ -201,6 +215,8 @@ export interface FileRoutesByTo {
   '/fertilizers/$fertilizerId': typeof AuthedFertilizersFertilizerIdRoute
   '/fertilizers/new': typeof AuthedFertilizersNewRoute
   '/onboarding/city': typeof AuthedOnboardingCityRoute
+  '/profile/delete': typeof AuthedProfileDeleteRoute
+  '/profile/name': typeof AuthedProfileNameRoute
   '/rooms/new': typeof AuthedRoomsNewRoute
   '/water/$plantId': typeof AuthedWaterPlantIdRoute
   '/plants/$plantId/edit': typeof AuthedPlantsPlantIdEditRoute
@@ -229,6 +245,8 @@ export interface FileRoutesById {
   '/_authed/fertilizers/$fertilizerId': typeof AuthedFertilizersFertilizerIdRoute
   '/_authed/fertilizers/new': typeof AuthedFertilizersNewRoute
   '/_authed/onboarding/city': typeof AuthedOnboardingCityRoute
+  '/_authed/profile/delete': typeof AuthedProfileDeleteRoute
+  '/_authed/profile/name': typeof AuthedProfileNameRoute
   '/_authed/rooms/new': typeof AuthedRoomsNewRoute
   '/_authed/water/$plantId': typeof AuthedWaterPlantIdRoute
   '/_authed/plants/$plantId/edit': typeof AuthedPlantsPlantIdEditRoute
@@ -255,6 +273,8 @@ export interface FileRouteTypes {
     | '/fertilizers/$fertilizerId'
     | '/fertilizers/new'
     | '/onboarding/city'
+    | '/profile/delete'
+    | '/profile/name'
     | '/rooms/new'
     | '/water/$plantId'
     | '/plants/$plantId/edit'
@@ -279,6 +299,8 @@ export interface FileRouteTypes {
     | '/fertilizers/$fertilizerId'
     | '/fertilizers/new'
     | '/onboarding/city'
+    | '/profile/delete'
+    | '/profile/name'
     | '/rooms/new'
     | '/water/$plantId'
     | '/plants/$plantId/edit'
@@ -306,6 +328,8 @@ export interface FileRouteTypes {
     | '/_authed/fertilizers/$fertilizerId'
     | '/_authed/fertilizers/new'
     | '/_authed/onboarding/city'
+    | '/_authed/profile/delete'
+    | '/_authed/profile/name'
     | '/_authed/rooms/new'
     | '/_authed/water/$plantId'
     | '/_authed/plants/$plantId/edit'
@@ -445,6 +469,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedOnboardingCityRouteImport
       parentRoute: typeof AuthedRoute
     }
+    '/_authed/profile/delete': {
+      id: '/_authed/profile/delete'
+      path: '/profile/delete'
+      fullPath: '/profile/delete'
+      preLoaderRoute: typeof AuthedProfileDeleteRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/profile/name': {
+      id: '/_authed/profile/name'
+      path: '/profile/name'
+      fullPath: '/profile/name'
+      preLoaderRoute: typeof AuthedProfileNameRouteImport
+      parentRoute: typeof AuthedRoute
+    }
     '/_authed/rooms/new': {
       id: '/_authed/rooms/new'
       path: '/rooms/new'
@@ -527,6 +565,8 @@ interface AuthedRouteChildren {
   AuthedFertilizersFertilizerIdRoute: typeof AuthedFertilizersFertilizerIdRoute
   AuthedFertilizersNewRoute: typeof AuthedFertilizersNewRoute
   AuthedOnboardingCityRoute: typeof AuthedOnboardingCityRoute
+  AuthedProfileDeleteRoute: typeof AuthedProfileDeleteRoute
+  AuthedProfileNameRoute: typeof AuthedProfileNameRoute
   AuthedRoomsNewRoute: typeof AuthedRoomsNewRoute
   AuthedWaterPlantIdRoute: typeof AuthedWaterPlantIdRoute
   AuthedPlantsPlantIdEditRoute: typeof AuthedPlantsPlantIdEditRoute
@@ -544,6 +584,8 @@ const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedFertilizersFertilizerIdRoute: AuthedFertilizersFertilizerIdRoute,
   AuthedFertilizersNewRoute: AuthedFertilizersNewRoute,
   AuthedOnboardingCityRoute: AuthedOnboardingCityRoute,
+  AuthedProfileDeleteRoute: AuthedProfileDeleteRoute,
+  AuthedProfileNameRoute: AuthedProfileNameRoute,
   AuthedRoomsNewRoute: AuthedRoomsNewRoute,
   AuthedWaterPlantIdRoute: AuthedWaterPlantIdRoute,
   AuthedPlantsPlantIdEditRoute: AuthedPlantsPlantIdEditRoute,

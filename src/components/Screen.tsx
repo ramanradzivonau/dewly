@@ -20,12 +20,3 @@ export function Screen({
     </main>
   )
 }
-
-/** Placeholder card for screens that aren't built yet. */
-export function StubCard({ children }: { children: ReactNode }) {
-  return (
-    <section className="rounded-lg border border-border bg-surface p-5 text-body text-ink-subtle">
-      {children}
-    </section>
-  )
-}

@@ -1,4 +1,4 @@
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { z } from 'zod'
 
@@ -15,6 +15,7 @@ import {
 import { UpcomingCalendar, UpcomingList } from '@/features/care/Upcoming'
 import { formatDose, shortDose } from '@/features/fertilizers/api'
 import { PlantPhoto } from '@/features/plants/PlantPhoto'
+import { profileQuery } from '@/features/profile/api'
 import { toast } from '@/lib/toast'
 
 export const Route = createFileRoute('/_authed/_tabs/today')({
@@ -42,6 +43,8 @@ const byUrgency = (a: DueTask, b: DueTask) =>
 function TodayScreen() {
   const { tab, view } = Route.useSearch()
   const { data: tasks } = useSuspenseQuery(tasksQuery())
+  const { user } = Route.useRouteContext()
+  const name = useQuery(profileQuery(user.id)).data?.display_name?.split(' ')[0]
   const today = tasks.filter(isToday).sort(byUrgency)
   const water = today.filter((t) => t.type === 'water')
   const fertilize = today.filter((t) => t.type === 'fertilize')
@@ -63,7 +66,10 @@ function TodayScreen() {
   return (
     <main className="mx-auto flex max-w-md flex-col gap-5.5 px-4 pt-screen pb-40">
       <header className="flex flex-col gap-1.5 px-1">
-        <h1 className="text-display text-primary">{greeting()}</h1>
+        <h1 className="text-display text-primary">
+          {greeting()}
+          {name ? `, ${name}` : ''}
+        </h1>
         <p className="text-body text-ink-muted">{summary}</p>
       </header>
 
