@@ -1,8 +1,9 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
+import { z } from 'zod'
 
 import { DewlyLogo } from '@/components/DewlyLogo'
-import { CheckIcon } from '@/components/icons'
+import { CalendarIcon, CheckIcon, ListIcon } from '@/components/icons'
 import {
   isToday,
   lateBadge,
@@ -12,10 +13,16 @@ import {
   useWater,
   type DueTask,
 } from '@/features/care/api'
+import { UpcomingCalendar, UpcomingList } from '@/features/care/Upcoming'
 import { formatDose, shortDose } from '@/features/fertilizers/api'
 import { PlantPhoto } from '@/features/plants/PlantPhoto'
 
 export const Route = createFileRoute('/_authed/_tabs/today')({
+  // Today / Upcoming tabs and the Upcoming view live in the URL, so Back keeps them.
+  validateSearch: z.object({
+    tab: z.enum(['today', 'upcoming']).catch('today').default('today'),
+    view: z.enum(['list', 'calendar']).catch('list').default('list'),
+  }),
   loader: ({ context }) => context.queryClient.ensureQueryData(tasksQuery()),
   component: TodayScreen,
 })
@@ -33,6 +40,7 @@ const byUrgency = (a: DueTask, b: DueTask) =>
   b.overdue_days - a.overdue_days
 
 function TodayScreen() {
+  const { tab, view } = Route.useSearch()
   const { data: tasks } = useSuspenseQuery(tasksQuery())
   // Progress tasks join Today with the progress form (phase 5).
   const today = tasks.filter(isToday).sort(byUrgency)
@@ -62,7 +70,7 @@ function TodayScreen() {
         <p className="text-body text-ink-muted">{summary}</p>
       </header>
 
-      {open.length > 0 && (
+      {tab === 'today' && open.length > 0 && (
         <div className="-mx-4 scrollbar-none flex gap-2.5 overflow-x-auto px-5">
           <Chip tone="bg-primary-soft text-primary" dot="bg-primary-text">
             {open.length === 1 ? '1 task today' : `${open.length} tasks today`}
@@ -80,16 +88,32 @@ function TodayScreen() {
         </div>
       )}
 
-      {water.length > 0 && (
-        <TaskGroup title="Water" tasks={water} hint="Tap a plant for instructions" />
-      )}
-      {fertilize.length > 0 && (
-        <TaskGroup title="Fertilize" tasks={fertilize} hint="Granules and sticks, by the dose" />
-      )}
-      {today.length === 0 && tasks.length > 0 && (
-        <p className="rounded-lg bg-surface p-5 text-body text-ink-subtle">
-          All watered. Enjoy the day.
-        </p>
+      <Tabs tab={tab} view={view} />
+
+      {tab === 'upcoming' ? (
+        view === 'calendar' ? (
+          <UpcomingCalendar tasks={tasks} />
+        ) : (
+          <UpcomingList tasks={tasks} />
+        )
+      ) : (
+        <>
+          {water.length > 0 && (
+            <TaskGroup title="Water" tasks={water} hint="Tap a plant for instructions" />
+          )}
+          {fertilize.length > 0 && (
+            <TaskGroup
+              title="Fertilize"
+              tasks={fertilize}
+              hint="Granules and sticks, by the dose"
+            />
+          )}
+          {today.length === 0 && tasks.length > 0 && (
+            <p className="rounded-lg bg-surface p-5 text-body text-ink-subtle">
+              All watered. Enjoy the day.
+            </p>
+          )}
+        </>
       )}
     </main>
   )
@@ -197,6 +221,58 @@ function TaskRow({ task }: { task: DueTask }) {
       >
         <CheckIcon width={20} height={20} />
       </button>
+    </div>
+  )
+}
+
+/** Today / Upcoming switch; on Upcoming, a button flips between list and calendar. */
+function Tabs({ tab, view }: { tab: 'today' | 'upcoming'; view: 'list' | 'calendar' }) {
+  const tabClass = (on: boolean) =>
+    `flex min-h-11 items-center rounded-pill px-5.5 text-label ${
+      on ? 'bg-primary font-bold text-on-primary' : 'font-semibold text-ink-muted'
+    }`
+
+  return (
+    <div className="flex items-center justify-center gap-2.5">
+      <div role="tablist" aria-label="Tasks" className="flex rounded-pill bg-track p-1">
+        <Link
+          to="/today"
+          search={{ tab: 'today', view }}
+          replace
+          role="tab"
+          aria-selected={tab === 'today'}
+          className={tabClass(tab === 'today')}
+        >
+          Today
+        </Link>
+        <Link
+          to="/today"
+          search={{ tab: 'upcoming', view }}
+          replace
+          role="tab"
+          aria-selected={tab === 'upcoming'}
+          className={tabClass(tab === 'upcoming')}
+        >
+          Upcoming
+        </Link>
+      </div>
+      {tab === 'upcoming' && (
+        <Link
+          to="/today"
+          search={{ tab, view: view === 'list' ? 'calendar' : 'list' }}
+          replace
+          aria-label={view === 'list' ? 'Show as calendar' : 'Show as list'}
+          className={`flex size-13 items-center justify-center rounded-pill ${
+            view === 'calendar' ? 'bg-primary text-on-primary' : 'bg-track text-primary'
+          }`}
+        >
+          {view === 'list' ? (
+            <CalendarIcon width={22} height={22} />
+          ) : (
+            <ListIcon width={22} height={22} />
+          )}
+        </Link>
+      )}
     </div>
   )
 }
