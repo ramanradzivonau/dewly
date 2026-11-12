@@ -185,7 +185,9 @@ export function useUpdatePlant(userId: string, plant: Plant) {
         if (photo && cover_photo) await removePhotos([cover_photo])
         throw error
       }
-      if (photo && plant.cover_photo) await removePhotos([plant.cover_photo])
+      if (photo && plant.cover_photo && !(await usedByProgress(plant.cover_photo))) {
+        await removePhotos([plant.cover_photo])
+      }
 
       const schedule = plant.schedule
         ? await supabase
@@ -210,9 +212,18 @@ export function useDeletePlant(plant: Plant) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async () => {
+      // Progress photos go with the plant; collect them before the rows cascade away.
+      const entries = await supabase
+        .from('progress_entries')
+        .select('photo_path')
+        .eq('plant_id', plant.id)
       const { error } = await supabase.from('plants').delete().eq('id', plant.id)
       if (error) throw error
-      if (plant.cover_photo) await removePhotos([plant.cover_photo])
+      const paths = new Set(
+        (entries.data ?? []).flatMap((e) => (e.photo_path ? [e.photo_path as string] : [])),
+      )
+      if (plant.cover_photo) paths.add(plant.cover_photo)
+      await removePhotos([...paths])
     },
     onSuccess: () => {
       queryClient.removeQueries({ queryKey: [...plantsKey, plant.id] })
@@ -222,4 +233,13 @@ export function useDeletePlant(plant: Plant) {
       ])
     },
   })
+}
+
+/** A cover that came from a progress entry stays in storage with that entry. */
+async function usedByProgress(path: string) {
+  const { count } = await supabase
+    .from('progress_entries')
+    .select('id', { count: 'exact', head: true })
+    .eq('photo_path', path)
+  return (count ?? 0) > 0
 }

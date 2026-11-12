@@ -2,7 +2,7 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { z } from 'zod'
 
-import { CalendarIcon, CheckIcon, ListIcon } from '@/components/icons'
+import { CalendarIcon, CameraIcon, CheckIcon, ListIcon } from '@/components/icons'
 import {
   isToday,
   lateBadge,
@@ -41,11 +41,11 @@ const byUrgency = (a: DueTask, b: DueTask) =>
 function TodayScreen() {
   const { tab, view } = Route.useSearch()
   const { data: tasks } = useSuspenseQuery(tasksQuery())
-  // Progress tasks join Today with the progress form (phase 5).
   const today = tasks.filter(isToday).sort(byUrgency)
   const water = today.filter((t) => t.type === 'water')
   const fertilize = today.filter((t) => t.type === 'fertilize')
-  const open = [...water, ...fertilize].filter((t) => !t.done_today_event_id)
+  const progress = today.filter((t) => t.type === 'progress')
+  const open = [...water, ...fertilize, ...progress].filter((t) => !t.done_today_event_id)
   const late = open.filter((t) => t.overdue_days > 0).length
   const fed = open.filter((t) => t.type === 'fertilize' || t.with_fertilizer).length
   const thirsty = water.filter((t) => !t.done_today_event_id).length
@@ -57,7 +57,7 @@ function TodayScreen() {
         ? 'All done for today.'
         : thirsty > 0
           ? `${plantsWord(thirsty)} ${thirsty === 1 ? 'needs' : 'need'} water today${late ? `, ${late} ${late === 1 ? 'is' : 'are'} late` : ''}.`
-          : `${plantsWord(open.length)} ${open.length === 1 ? 'needs' : 'need'} fertilizer today.`
+          : `${plantsWord(open.length)} ${open.length === 1 ? 'needs' : 'need'} you today.`
 
   return (
     <main className="mx-auto flex max-w-md flex-col gap-5.5 px-4 pt-screen pb-40">
@@ -104,6 +104,13 @@ function TodayScreen() {
               hint="Granules and sticks, by the dose"
             />
           )}
+          {progress.length > 0 && (
+            <TaskGroup
+              title="Progress update"
+              tasks={progress}
+              hint="Add a photo, height and condition"
+            />
+          )}
           {today.length === 0 && tasks.length > 0 && (
             <p className="rounded-lg bg-surface p-5 text-body text-ink-subtle">
               All watered. Enjoy the day.
@@ -148,6 +155,50 @@ function Chip({ tone, dot, children }: { tone: string; dot: string; children: st
 }
 
 function TaskRow({ task }: { task: DueTask }) {
+  return task.type === 'progress' ? <ProgressRow task={task} /> : <CheckRow task={task} />
+}
+
+/** Progress can't be ticked off: the camera opens the form, and saving closes the task. */
+function ProgressRow({ task }: { task: DueTask }) {
+  return (
+    <div className="flex items-center gap-3.5 py-2.5">
+      <TaskPhoto task={task} done={false} />
+      <Link
+        to="/plants/$plantId/progress"
+        params={{ plantId: task.plant_id }}
+        className="flex min-w-0 flex-1 flex-col gap-0.5"
+      >
+        <span className="truncate text-body-strong text-ink">{task.nickname}</span>
+        <span className="truncate text-field-label font-medium text-ink-subtle">
+          {task.room_name}
+        </span>
+      </Link>
+      <Link
+        to="/plants/$plantId/progress"
+        params={{ plantId: task.plant_id }}
+        aria-label={`Update progress for ${task.nickname}`}
+        className="flex size-11 shrink-0 items-center justify-center rounded-pill bg-primary-soft text-primary"
+      >
+        <CameraIcon width={22} height={22} />
+      </Link>
+    </div>
+  )
+}
+
+function TaskPhoto({ task, done }: { task: DueTask; done: boolean }) {
+  return (
+    <span className="relative shrink-0">
+      <PlantPhoto path={task.cover_photo} alt="" className="size-15 rounded-pill" iconSize={26} />
+      {!done && task.overdue_days > 0 && (
+        <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 rounded-sm border-2 border-surface bg-danger-soft px-1.5 text-nav font-extrabold whitespace-nowrap text-danger-strong">
+          {lateBadge(task.overdue_days)}
+        </span>
+      )}
+    </span>
+  )
+}
+
+function CheckRow({ task }: { task: DueTask }) {
   const water = useWater()
   const fertilize = useFertilize()
   const undo = useUndo()
@@ -174,14 +225,7 @@ function TaskRow({ task }: { task: DueTask }) {
 
   return (
     <div className="flex items-center gap-3.5 py-2.5">
-      <span className="relative shrink-0">
-        <PlantPhoto path={task.cover_photo} alt="" className="size-15 rounded-pill" iconSize={26} />
-        {!done && task.overdue_days > 0 && (
-          <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 rounded-sm border-2 border-surface bg-danger-soft px-1.5 text-nav font-extrabold whitespace-nowrap text-danger-strong">
-            {lateBadge(task.overdue_days)}
-          </span>
-        )}
-      </span>
+      <TaskPhoto task={task} done={done} />
       <Link
         {...(isWater
           ? { to: '/water/$plantId', params: { plantId: task.plant_id } }
