@@ -10,16 +10,22 @@ export function usePickedPhoto() {
 
   useEffect(() => () => void (preview && URL.revokeObjectURL(preview)), [preview])
 
+  /** An already resized photo, e.g. the one sent for identification. */
+  const set = (resized: Blob) => {
+    setError(null)
+    setBlob(resized)
+    setPreview(URL.createObjectURL(resized))
+  }
+
   const pick = async (file: File) => {
     setError(null)
     try {
       const resized = await resizePhoto(file)
-      setBlob(resized)
-      setPreview(URL.createObjectURL(resized))
+      set(resized)
     } catch {
       setError('Couldn’t read this photo. Try another one.')
     }
   }
 
-  return { blob, preview, error, pick }
+  return { blob, preview, error, pick, set }
 }

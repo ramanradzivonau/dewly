@@ -23,6 +23,8 @@ import {
 } from '@/features/plants/fields'
 import { plantSchema, type PlantFormValues } from '@/features/plants/options'
 import { usePickedPhoto } from '@/features/plants/usePickedPhoto'
+import type { SpeciesPick } from '@/features/species/api'
+import { SpeciesField } from '@/features/species/SpeciesField'
 import { fertilizersQuery } from '@/features/fertilizers/api'
 import { roomsQuery } from '@/features/rooms/api'
 
@@ -53,6 +55,7 @@ function EditPlantForm({ plant }: { plant: Plant }) {
   const { data: fertilizers } = useSuspenseQuery(fertilizersQuery())
   const update = useUpdatePlant(user.id, plant)
   const photo = usePickedPhoto()
+  const [species, setSpecies] = useState<SpeciesPick | null>(null)
   const form = useForm<PlantFormValues>({
     resolver: zodResolver(plantSchema),
     defaultValues: toFormValues(plant),
@@ -60,7 +63,7 @@ function EditPlantForm({ plant }: { plant: Plant }) {
 
   const onSubmit = form.handleSubmit((values) =>
     update.mutate(
-      { values, photo: photo.blob },
+      { values, photo: photo.blob, species },
       {
         onSuccess: () =>
           navigate({ to: '/plants/$plantId', params: { plantId: plant.id }, replace: true }),
@@ -85,6 +88,7 @@ function EditPlantForm({ plant }: { plant: Plant }) {
           </Button>
         }
       >
+        <SpeciesField current={plant.species} picked={species} onPick={setSpecies} />
         <PhotoNameFields
           coverPath={plant.cover_photo}
           preview={photo.preview}

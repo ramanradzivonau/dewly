@@ -21,8 +21,11 @@ import { plantDefaults, plantSchema, type PlantFormValues } from '@/features/pla
 import { usePickedPhoto } from '@/features/plants/usePickedPhoto'
 import { fertilizersQuery } from '@/features/fertilizers/api'
 import { roomsQuery } from '@/features/rooms/api'
+import type { SpeciesPick } from '@/features/species/api'
+import { IdentifyStep } from '@/features/species/IdentifyStep'
 
 const steps: { title: string; fields: FieldPath<PlantFormValues>[] }[] = [
+  { title: 'What plant is it?', fields: [] },
   { title: 'Name & room', fields: ['nickname', 'room_id'] },
   {
     title: 'Pot & soil',
@@ -65,7 +68,7 @@ export const Route = createFileRoute('/_authed/new-plant')({
   component: NewPlantScreen,
 })
 
-/** Add plant: four steps in one form. Species identification joins as step 1 in phase 6. */
+/** Add plant: five steps in one form, starting with the species. */
 function NewPlantScreen() {
   const { step, roomId } = Route.useSearch()
   const { user } = Route.useRouteContext()
@@ -76,6 +79,7 @@ function NewPlantScreen() {
   const photo = usePickedPhoto()
   const [startedAt] = useState(step)
   const [lastWatered, setLastWatered] = useState<LastWatered>('unknown')
+  const [species, setSpecies] = useState<SpeciesPick | null>(null)
 
   const form = useForm<PlantFormValues>({
     resolver: zodResolver(plantSchema),
@@ -101,7 +105,12 @@ function NewPlantScreen() {
 
   const onSubmit = form.handleSubmit((values) =>
     create.mutate(
-      { values, photo: photo.blob, lastWateredDaysAgo: lastWateredDays[lastWatered] },
+      {
+        values,
+        photo: photo.blob,
+        lastWateredDaysAgo: lastWateredDays[lastWatered],
+        species,
+      },
       {
         onSuccess: ({ id }) =>
           navigate({ to: '/plants/$plantId', params: { plantId: id }, replace: true }),
@@ -130,6 +139,7 @@ function NewPlantScreen() {
         : { to: '/plants' as const, label: 'Close', icon: 'close' as const }
 
   const subtitles = [
+    'Identify it by photo or find it by name.',
     'A photo and a name you’ll recognise in Today.',
     'Not sure? Pick the closest option, you can change it later.',
     room ? `Light and climate come from ${room.name}.` : 'Light and climate come from the room.',
@@ -152,6 +162,19 @@ function NewPlantScreen() {
         }
       >
         {step === 1 && (
+          <IdentifyStep
+            picked={species}
+            onPhoto={photo.set}
+            onPick={(pick) => {
+              setSpecies(pick)
+              // A name to start from; the next step lets the user change it.
+              if (pick && !form.getValues('nickname').trim()) {
+                form.setValue('nickname', pick.common_name ?? pick.scientific_name)
+              }
+            }}
+          />
+        )}
+        {step === 2 && (
           <>
             <PhotoNameFields
               coverPath={null}
@@ -162,9 +185,9 @@ function NewPlantScreen() {
             <RoomField rooms={rooms} />
           </>
         )}
-        {step === 2 && <PotSoilFields />}
-        {step === 3 && <PlantSpotFields />}
-        {step === 4 && (
+        {step === 3 && <PotSoilFields />}
+        {step === 4 && <PlantSpotFields />}
+        {step === 5 && (
           <>
             <ScheduleFields />
             <FertilizerFields fertilizers={fertilizers} />

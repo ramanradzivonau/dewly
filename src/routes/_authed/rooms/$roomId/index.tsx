@@ -78,7 +78,14 @@ function RoomScreen() {
                 className="flex items-center gap-3 py-3"
               >
                 <PlantPhoto path={plant.cover_photo} alt="" className="size-13 rounded-md" />
-                <span className="flex-1 text-body-strong text-ink">{plant.nickname}</span>
+                <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+                  <span className="truncate text-body-strong text-ink">{plant.nickname}</span>
+                  {plant.species && (
+                    <span className="truncate text-caption font-medium text-ink-subtle italic">
+                      {plant.species.scientific_name}
+                    </span>
+                  )}
+                </span>
                 <ChevronRightIcon width={18} height={18} className="text-primary" />
               </Link>
             </li>

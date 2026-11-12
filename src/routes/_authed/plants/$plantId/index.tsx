@@ -74,7 +74,15 @@ function PlantScreen() {
         </Link>
       </nav>
 
-      <h1 className="px-1 text-display text-primary">{plant.nickname}</h1>
+      <header className="flex flex-col gap-0.5 px-1">
+        <h1 className="text-display text-primary">{plant.nickname}</h1>
+        {plant.species && (
+          <p className="text-label font-medium text-ink-subtle">
+            <i>{plant.species.scientific_name}</i>
+            {plant.species.common_name ? ` · ${plant.species.common_name}` : null}
+          </p>
+        )}
+      </header>
 
       <div className="relative">
         <PlantPhoto
